@@ -1,0 +1,10 @@
+version: '2.1'
+
+services:
+  redisedge:
+    image: redisedge
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 6379:6379
