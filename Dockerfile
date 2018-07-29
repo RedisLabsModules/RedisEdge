@@ -4,7 +4,7 @@ FROM redislabs/redisml:latest as redisml
 FROM redislabs/rejson:latest as rejson
 FROM redislabs/rebloom:latest as rebloom
 
-FROM redis:5-rc as redis
+FROM redis:5.0-rc as redis
 ENV LIBDIR /usr/lib/redis/modules
 WORKDIR /data
 RUN set -ex;\
