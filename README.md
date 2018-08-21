@@ -1,14 +1,14 @@
-# redisedge - a Docker image with select Redis Labs modules for the Edge
+# redis-edge - a Docker image with select Redis Labs modules for the Edge
 
 This simple container image bundles together the latest release candidate of [Redis](https://redis.io) v5 with Redis Streams, and select Redis modules from [Redis Labs](https://redislabs.com).
 
 # Quickstart
 
 ```text
-$ docker pull redislabs/redisedge
+$ docker pull redislabs/redis-edge
 Using default tag: latest
 ...
-$ docker run -p 6379:6379 redislabs/redisedge
+$ docker run -p 6379:6379 redislabs/redis-edge
 1:C 01 May 06:37:09.042 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
 ...
 1:M 01 May 06:37:09.666 * Module 'ft' loaded from /usr/lib/redis/modules/redisearch.so
@@ -41,7 +41,7 @@ You can provide Redis with configuration directives directly from the `docker` c
 $ docker run \
   -p 6379:6379 \
   -v /home/user/data:/data \
-  redislabs/redisedge \
+  redislabs/redis-edge \
   --loadmodule /usr/lib/redis/modules/rebloom.so \
   --dir /data
 ```
@@ -63,7 +63,7 @@ $ docker run \
   -p 6379:6379 \
   -v /home/user/data:/data \
   -v /home/user/redis.conf:/usr/local/etc/redis/redis.conf \
-  redislabs/redisedge \
+  redislabs/redis-edge \
   /usr/local/etc/redis/redis.conf
 ```
 
