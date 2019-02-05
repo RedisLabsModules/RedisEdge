@@ -1,31 +1,25 @@
-# redis-edge - a Docker image with select Redis Labs modules for the Edge
+# redisedge - a Docker image with select Redis Labs modules for the Edge
 
-This simple container image bundles together the latest release candidate of [Redis](https://redis.io) v5 with Redis Streams, and select Redis modules from [Redis Labs](https://redislabs.com).
+This simple container image bundles together the latest release [Redis](https://redis.io), and select Redis modules from [Redis Labs](https://redislabs.com).
 
 # Quickstart
 
 ```text
-$ docker pull redislabs/redis-edge
+$ docker pull redislabs/redisedge
 Using default tag: latest
 ...
-$ docker run -p 6379:6379 redislabs/redis-edge
-1:C 01 May 06:37:09.042 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+$ docker run -p 6379:6379 redislabs/redisedge
+1:C 04 Feb 2019 21:26:05.335 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
 ...
-1:M 01 May 06:37:09.666 * Module 'ft' loaded from /usr/lib/redis/modules/redisearch.so
-1:M 01 May 06:37:09.666 * Module 'graph' loaded from /usr/lib/redis/modules/redisgraph.so
-1:M 01 May 06:37:09.666 * Module 'redis-ml' loaded from /usr/lib/redis/modules/redis-ml.so
-1:M 01 May 06:37:09.666 * Module 'ReJSON' loaded from /usr/lib/redis/modules/rejson.so
-1:M 01 May 06:37:09.666 * Module 'bf' loaded from /usr/lib/redis/modules/rebloom.so
-1:M 01 May 06:37:09.666 * Ready to accept connections
+1:M 04 Feb 2019 21:26:05.337 * Module 'tsdb' loaded from /usr/lib/redis/modules/redistimeseries.so
+1:M 04 Feb 2019 21:26:05.341 * Module 'ai' loaded from /usr/lib/redis/modules/redisai.so
+1:M 04 Feb 2019 21:26:05.341 * Ready to accept connections
 ```
 
 ## Modules included in the container
 
-* [RediSearch](http://redisearch.io): a full-featured search engine
-* [Redis Graph](http://redisgraph.io): a graph database
-* [Redis ML](http://redisml.io): a machine learning model server
-* [ReJSON](http://rejson.io): a native JSON data type
-* [Rebloom](http://rebloom.io): native Bloom and Cuckoo Filter data types
+* [RedisTimeSeries](https://oss.redislabs.com/redistimeseries/): a timeseries database
+* [RedisAI](https://oss.redislabs.com/redisai/): a tensor and deep learning graphs server
 
 ## Configuring the Redis server
 
@@ -35,14 +29,14 @@ You can, of course, override the defaults. This can be done either by providing 
 
 ### Running the container with command line arguments
 
-You can provide Redis with configuration directives directly from the `docker` command. For example, the following will start the container, mount the host's `/home/user/data` volume to the container's `/data`, load the Rebloom module, and configure Redis' working directory to `/data` so that the data will actually be persisted there.
+You can provide Redis with configuration directives directly from the `docker` command. For example, the following will start the container, mount the host's `/home/user/data` volume to the container's `/data`, load the RedisAI module, and configure Redis' working directory to `/data` so that the data will actually be persisted there.
 
 ```text
 $ docker run \
   -p 6379:6379 \
   -v /home/user/data:/data \
-  redislabs/redis-edge \
-  --loadmodule /usr/lib/redis/modules/rebloom.so \
+  redislabs/redisedge \
+  --loadmodule /usr/lib/redis/modules/redisai.so \
   --dir /data
 ```
 
@@ -53,7 +47,7 @@ Assuming that you have put together a configration file such as the following, a
 ```text
 requirepass foobared
 dir /data
-loadmodule /usr/lib/redis/modules/rebloom.so
+loadmodule /usr/lib/redis/modules/redisai.so
 ```
 
 And then execute something along these lines:
@@ -63,11 +57,11 @@ $ docker run \
   -p 6379:6379 \
   -v /home/user/data:/data \
   -v /home/user/redis.conf:/usr/local/etc/redis/redis.conf \
-  redislabs/redis-edge \
+  redislabs/redisedge \
   /usr/local/etc/redis/redis.conf
 ```
 
-Your dockerized Redis server will start and will be listening at the default Redis port (6379) of the host. In addition, the Redis server will require password authentication ("foobared"), will store the data to the container's `/data` (that is the host's volume `/home/user/data`), and will have loaded only the Rebloom module.
+Your dockerized Redis server will start and will be listening at the default Redis port (6379) of the host. In addition, the Redis server will require password authentication ("foobared"), will store the data to the container's `/data` (that is the host's volume `/home/user/data`), and will have loaded only the RedisAI module.
 
 ## License
 

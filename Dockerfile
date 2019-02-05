@@ -1,23 +1,16 @@
-FROM redislabs/redisearch:latest as redisearch
-FROM redislabs/redisgraph:latest as redisgraph
-FROM redislabs/redisml:latest as redisml
-FROM redislabs/rejson:latest as rejson
-FROM redislabs/rebloom:latest as rebloom
+FROM redislabs/redistimeseries:latest as redistimeseries
+FROM redisai/redisai:latest as redisai
 
-FROM redis:5.0-rc as redis
-ENV LIBDIR /usr/lib/redis/modules
+FROM redis:latest as redis
+ENV LD_LIBRARY_PATH /usr/lib/redis/modules
 WORKDIR /data
 RUN set -ex;\
-    mkdir -p ${LIBDIR};
-COPY --from=redisearch ${LIBDIR}/redisearch.so ${LIBDIR}
-COPY --from=redisgraph ${LIBDIR}/redisgraph.so ${LIBDIR}
-COPY --from=redisml ${LIBDIR}/redis-ml.so ${LIBDIR}
-COPY --from=rejson ${LIBDIR}/rejson.so ${LIBDIR}
-COPY --from=rebloom ${LIBDIR}/rebloom.so ${LIBDIR}
+    mkdir -p ${LD_LIBRARY_PATH};
 
-ENTRYPOINT ["redis-server"]
-CMD ["--loadmodule", "/usr/lib/redis/modules/redisearch.so", \
-    "--loadmodule", "/usr/lib/redis/modules/redisgraph.so", \
-    "--loadmodule", "/usr/lib/redis/modules/redis-ml.so", \
-    "--loadmodule", "/usr/lib/redis/modules/rejson.so", \
-    "--loadmodule", "/usr/lib/redis/modules/rebloom.so"]
+COPY --from=redistimeseries ${LD_LIBRARY_PATH}/redistimeseries.so ${LD_LIBRARY_PATH}
+COPY --from=redisai ${LD_LIBRARY_PATH}/redisai.so ${LD_LIBRARY_PATH}
+COPY --from=redisai ${LD_LIBRARY_PATH}/libtensorflow.so ${LD_LIBRARY_PATH}
+COPY --from=redisai ${LD_LIBRARY_PATH}/libtensorflow_framework.so ${LD_LIBRARY_PATH}
+
+CMD ["--loadmodule", "/usr/lib/redis/modules/redistimeseries.so", \
+    "--loadmodule", "/usr/lib/redis/modules/redisai.so"]
