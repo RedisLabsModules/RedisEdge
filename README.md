@@ -1,6 +1,8 @@
-# redisedge - a Docker image with select Redis Labs modules for the Edge
+# redisedge - The Docker image for RedisEdge
 
-This simple container image bundles together the latest release [Redis](https://redis.io), and select Redis modules from [Redis Labs](https://redislabs.com).
+RedisEdge from Redis Labs is a purpose-built database for the demanding conditions at the IoT edge.
+
+This container image bundles together the latest release [Redis](https://redis.io), and select Redis modules from [Redis Labs](https://redislabs.com).
 
 # Quickstart
 
@@ -70,4 +72,3 @@ This Docker image is licensed under the 3-Clause BSD License.
 Redis is distributed under the 3-Clause BSD License. The Redis trademark and logos are owned by Redis Labs Ltd, please read the Redis trademark guidelines (https://redis.io/topics/trademark) for our policy about the use of the Redis trademarks and logo.
 
 The copyright of the Redis modules in this container belongs to Redis Labs, and the modules are distributed under the Apache 2.0 license with Commons Clause.
-
