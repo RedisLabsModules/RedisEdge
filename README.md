@@ -1,25 +1,31 @@
 # redisedge - a Docker image with select Redis Labs modules for the Edge
 
-This simple container image bundles together the latest release [Redis](https://redis.io), and select Redis modules from [Redis Labs](https://redislabs.com).
+This container image bundles together [Redis](https://redis.io) with Redis modules from [Redis Labs](https://redislabs.com) for Edge computing.
 
 # Quickstart
 
 ```text
-$ docker pull redislabs/redisedge
-Using default tag: latest
-...
 $ docker run -p 6379:6379 redislabs/redisedge
-1:C 04 Feb 2019 21:26:05.335 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 06 Apr 2019 12:37:27.768 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 06 Apr 2019 12:37:27.768 # Redis version=5.0.4, bits=64, commit=00000000, modified=0, pid=1, just started
 ...
-1:M 04 Feb 2019 21:26:05.337 * Module 'tsdb' loaded from /usr/lib/redis/modules/redistimeseries.so
-1:M 04 Feb 2019 21:26:05.341 * Module 'ai' loaded from /usr/lib/redis/modules/redisai.so
-1:M 04 Feb 2019 21:26:05.341 * Ready to accept connections
+1:M 06 Apr 2019 12:37:27.769 * Module 'timeseries' loaded from /usr/lib/redis/modules/redistimeseries.so
+1:M 06 Apr 2019 12:37:27.860 * Module 'ai' loaded from /usr/lib/redis/modules/redisai.so
+1:M 06 Apr 2019 12:37:27.861 * <rg> RedisGears version 0.2.0, git_sha=500c09dcff85ea2d9e5b2c6e4389df73dd31e2a9
+1:M 06 Apr 2019 12:37:27.861 * <rg> PythonHomeDir:/usr/lib/redis/modules/deps/cpython/
+1:M 06 Apr 2019 12:37:27.861 * <rg> MaxExecutions:1000
+1:M 06 Apr 2019 12:37:27.861 * <rg> RedisAI api loaded successfully.
+could not initialize RediSearch_CheckApiVersionCompatibility
+1:M 06 Apr 2019 12:37:27.861 # <rg> could not initialize RediSearch api, running without Search support.
+1:M 06 Apr 2019 12:37:27.896 * Module 'rg' loaded from /usr/lib/redis/modules/redisgears.so
+1:M 06 Apr 2019 12:37:27.896 * Ready to accept connections
 ```
 
 ## Modules included in the container
 
 * [RedisTimeSeries](https://oss.redislabs.com/redistimeseries/): a timeseries database
 * [RedisAI](https://oss.redislabs.com/redisai/): a tensor and deep learning graphs server
+* [RedisGears](https://oss.redislabs.com/redisgears/): a dynamic execution framework
 
 ## Configuring the Redis server
 
@@ -69,5 +75,5 @@ This Docker image is licensed under the 3-Clause BSD License.
 
 Redis is distributed under the 3-Clause BSD License. The Redis trademark and logos are owned by Redis Labs Ltd, please read the Redis trademark guidelines (https://redis.io/topics/trademark) for our policy about the use of the Redis trademarks and logo.
 
-The copyright of the Redis modules in this container belongs to Redis Labs, and the modules are distributed under the Apache 2.0 license with Commons Clause.
+The copyright of the Redis modules in this container belongs to Redis Labs, and the modules are distributed under the [Redis Source Available License](https://github.com/RedisLabsModules/licenses/).
 
