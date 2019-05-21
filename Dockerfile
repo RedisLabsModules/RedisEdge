@@ -8,7 +8,7 @@ FROM raffapen/redisgears-arm:arm64-bionic as redisgears
 # FROM redislabs/redisgears:arm64-bionic as redisgears
 
 #----------------------------------------------------------------------------------------------
-FROM FROM raffapen/redis-arm:arm64-bionic
+FROM raffapen/redis-arm:arm64-bionic
 
 # FROM redislabs/redis-arm:arm64-bionic
 
