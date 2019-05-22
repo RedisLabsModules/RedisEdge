@@ -5,20 +5,25 @@ This container image bundles together [Redis](https://redis.io) with Redis modul
 # Quickstart
 
 ```text
-$ docker run -p 6379:6379 redislabs/redisedge
-1:C 06 Apr 2019 12:37:27.768 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
-1:C 06 Apr 2019 12:37:27.768 # Redis version=5.0.4, bits=64, commit=00000000, modified=0, pid=1, just started
+$ $ docker run -it -p 6379:6379 redisedge
+1:C 22 May 2019 21:03:43.669 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 22 May 2019 21:03:43.669 # Redis version=5.0.5, bits=64, commit=00000000, modified=0, pid=1, just started
+1:C 22 May 2019 21:03:43.669 # Configuration loaded
 ...
-1:M 06 Apr 2019 12:37:27.769 * Module 'timeseries' loaded from /usr/lib/redis/modules/redistimeseries.so
-1:M 06 Apr 2019 12:37:27.860 * Module 'ai' loaded from /usr/lib/redis/modules/redisai.so
-1:M 06 Apr 2019 12:37:27.861 * <rg> RedisGears version 0.2.0, git_sha=500c09dcff85ea2d9e5b2c6e4389df73dd31e2a9
-1:M 06 Apr 2019 12:37:27.861 * <rg> PythonHomeDir:/usr/lib/redis/modules/deps/cpython/
-1:M 06 Apr 2019 12:37:27.861 * <rg> MaxExecutions:1000
-1:M 06 Apr 2019 12:37:27.861 * <rg> RedisAI api loaded successfully.
+1:M 22 May 2019 21:03:43.789 * Module 'ai' loaded from /usr/lib/redis/modules/redisai.so
+loaded default MAX_SAMPLE_PER_CHUNK policy: 360
+1:M 22 May 2019 21:03:43.789 * Module 'timeseries' loaded from /usr/lib/redis/modules/redistimeseries.so
+1:M 22 May 2019 21:03:43.791 * <rg> RedisGears version 0.3.1, git_sha=be5c5fcdf2abaabe5ff62155d9c38e0ecaa97575
+1:M 22 May 2019 21:03:43.791 * <rg> PythonHomeDir:/opt/redislabs/lib/modules/python3
+1:M 22 May 2019 21:03:43.791 * <rg> MaxExecutions:1000
+1:M 22 May 2019 21:03:43.791 * <rg> ProfileExecutions:0
+1:M 22 May 2019 21:03:43.791 * <rg> PythonAttemptTraceback:1
+1:M 22 May 2019 21:03:43.791 * <rg> RedisAI api loaded successfully.
 could not initialize RediSearch_CheckApiVersionCompatibility
-1:M 06 Apr 2019 12:37:27.861 # <rg> could not initialize RediSearch api, running without Search support.
-1:M 06 Apr 2019 12:37:27.896 * Module 'rg' loaded from /usr/lib/redis/modules/redisgears.so
-1:M 06 Apr 2019 12:37:27.896 * Ready to accept connections
+1:M 22 May 2019 21:03:43.791 # <rg> could not initialize RediSearch api, running without Search support.
+1:M 22 May 2019 21:03:43.804 * <rg> Initializing Python environment with: exec(open('/opt/redislabs/lib/modules/python3/.venv/bin/activate_this.py').read(), {'__file__': '/opt/redislabs/lib/modules/python3/.venv/bin/activate_this.py'})
+1:M 22 May 2019 21:03:43.840 * Module 'rg' loaded from /opt/redislabs/lib/modules/redisgears.so
+1:M 22 May 2019 21:03:43.840 * Ready to accept connections
 ```
 
 ## Modules included in the container
@@ -46,28 +51,18 @@ $ docker run \
   --dir /data
 ```
 
-### Running the container with a configuration file
+### Running the container with a custom configuration file
 
-Assuming that you have put together a configration file such as the following, and have stored it at `/home/user/redis.conf`:
-
-```text
-requirepass foobared
-dir /data
-loadmodule /usr/lib/redis/modules/redisai.so
-```
-
-And then execute something along these lines:
+This image uses a custom configuration file (located at `/etc/redisedge.conf`. You can use that as a starting point for putting together your own and store it somewhere like `/home/user/myredisedge.conf`. You can then load the container with the custom configuration file likeso:
 
 ```text
 $ docker run \
   -p 6379:6379 \
   -v /home/user/data:/data \
-  -v /home/user/redis.conf:/usr/local/etc/redis/redis.conf \
+  -v /home/user/myredisedge.conf:/usr/local/etc/redisedge.conf \
   redislabs/redisedge \
-  /usr/local/etc/redis/redis.conf
+  /usr/local/etc/redisedge.conf
 ```
-
-Your dockerized Redis server will start and will be listening at the default Redis port (6379) of the host. In addition, the Redis server will require password authentication ("foobared"), will store the data to the container's `/data` (that is the host's volume `/home/user/data`), and will have loaded only the RedisAI module.
 
 ## License
 
