@@ -24,11 +24,12 @@ ENV OPENCV_VERSION="4.1.0"
 
 RUN \
 	wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip ;\
-	unzip ${OPENCV_VERSION}.zip ;\
-	mkdir -p opencv-${OPENCV_VERSION}/cmake_binary ;\
-	cd opencv-${OPENCV_VERSION}/cmake_binary ;\
+	unzip ${OPENCV_VERSION}.zip
 
 RUN \
+	source /opt/redislabs/lib/modules/python3/.venv/bin/activate ;\
+	mkdir -p opencv-${OPENCV_VERSION}/cmake_binary ;\
+	cd opencv-${OPENCV_VERSION}/cmake_binary ;\
 	cmake -DBUILD_TIFF=ON \
 		-D BUILD_opencv_java=OFF \
 		-D WITH_CUDA=OFF \
@@ -53,8 +54,13 @@ RUN \
 		-D BUILD_NEW_PYTHON_SUPPORT=yes \
 		-D PYTHON_LIBRARY=$(python3 -c "from distutils.sysconfig import get_config_var;from os.path import dirname,join ; print(join(dirname(get_config_var('LIBPC')),get_config_var('LDLIBRARY')))") \
 		..
-RUN make -j`nproc`
-RUN make install
+RUN \
+	source /opt/redislabs/lib/modules/python3/.venv/bin/activate ;\
+	make -j`nproc`
+
+RUN \
+	source /opt/redislabs/lib/modules/python3/.venv/bin/activate ;\
+	make install
 
 #----------------------------------------------------------------------------------------------
 FROM raffapen/redis-arm:arm64-bionic
