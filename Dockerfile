@@ -1,19 +1,25 @@
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redis-arm:arm64-bionic as opencv
+FROM raffapen/redisgears-arm:arm64-bionic as gears
+# FROM redislabs/redisgears:arm64-bionic as gears
+
+FROM raffapen/redis-arm:arm64-bionic as gears-opencv
+
+SHELL ["/bin/bash", "-c"]
 
 COPY --from=redisgears /opt/redislabs /opt/redislabs
 
-RUN apt-get update; apt-get install -y \
+ENV OPENCV_VERSION="4.1.0"
+
+WORKDIR /opt
+
+RUN \
+	apt-get update; apt-get install -y \
 	build-essential cmake git wget unzip yasm pkg-config \
 	libswscale-dev libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libavformat-dev libpq-dev
 
 RUN \
 	source /opt/redislabs/lib/modules/python3/.venv/bin/activate ;\
 	pip install numpy
-
-WORKDIR /opt
-
-ENV OPENCV_VERSION="4.1.0"
 
 RUN \
 	wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip ;\
@@ -49,20 +55,20 @@ RUN \
 		..
 RUN \
 	source /opt/redislabs/lib/modules/python3/.venv/bin/activate ;\
+	cd opencv-${OPENCV_VERSION}/cmake_binary ;\
 	make -j`nproc`
 
 RUN \
 	source /opt/redislabs/lib/modules/python3/.venv/bin/activate ;\
+	cd opencv-${OPENCV_VERSION}/cmake_binary ;\
 	make install
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redisai-arm:arm64-bionic as redisai
-FROM raffapen/redistimeseries-arm:arm64-bionic as redistimeseries
-FROM raffapen/redisgears-arm:arm64-bionic as redisgears
+FROM raffapen/redisai-arm:arm64-bionic as ai
+FROM raffapen/redistimeseries-arm:arm64-bionic as timeseries
 
-# FROM redislabs/redisai-arm:cpu-arm64-bionic as redisai
-# FROM redislabs/redistimeseries:arm64-bionic as redistimeseries
-# FROM redislabs/redisgears:arm64-bionic as redisgears
+# FROM redislabs/redisai-arm:cpu-arm64-bionic as sai
+# FROM redislabs/redistimeseries:arm64-bionic as timeseries
 
 #----------------------------------------------------------------------------------------------
 FROM raffapen/redis-arm:arm64-bionic
@@ -73,13 +79,13 @@ RUN apt-get update; apt-get install -y libgomp1
 
 ENV LD_LIBRARY_PATH /usr/lib/redis/modules
 WORKDIR /data
-RUN set -ex;\
-    mkdir -p ${LD_LIBRARY_PATH};
+RUN set -ex ;\
+    mkdir -p ${LD_LIBRARY_PATH}
 
-COPY --from=redistimeseries ${LD_LIBRARY_PATH}/*.so ${LD_LIBRARY_PATH}/
-COPY --from=redisai ${LD_LIBRARY_PATH}/*.so* ${LD_LIBRARY_PATH}/
-COPY --from=redisgears /opt/redislabs/lib/modules/redisgears.so ${LD_LIBRARY_PATH}/
-COPY --from=opencv /opt/redislabs /opt/redislabs
+COPY --from=timeseries ${LD_LIBRARY_PATH}/*.so ${LD_LIBRARY_PATH}/
+COPY --from=ai ${LD_LIBRARY_PATH}/*.so* ${LD_LIBRARY_PATH}/
+COPY --from=gears /opt/redislabs/lib/modules/redisgears.so ${LD_LIBRARY_PATH}/
+COPY --from=gears-opencv /opt/redislabs /opt/redislabs
 
 CMD ["--loadmodule", "/usr/lib/redis/modules/redistimeseries.so", \
      "--loadmodule", "/usr/lib/redis/modules/redisai.so", \
