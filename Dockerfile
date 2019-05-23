@@ -1,13 +1,4 @@
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redisai-arm:arm64-bionic as redisai
-FROM raffapen/redistimeseries-arm:arm64-bionic as redistimeseries
-FROM raffapen/redisgears-arm:arm64-bionic as redisgears
-
-# FROM redislabs/redisai-arm:cpu-arm64-bionic as redisai
-# FROM redislabs/redistimeseries:arm64-bionic as redistimeseries
-# FROM redislabs/redisgears:arm64-bionic as redisgears
-
-#----------------------------------------------------------------------------------------------
 FROM raffapen/redis-arm:arm64-bionic as opencv
 
 COPY --from=redisgears /opt/redislabs /opt/redislabs
@@ -16,7 +7,9 @@ RUN apt-get update; apt-get install -y \
 	build-essential cmake git wget unzip yasm pkg-config \
 	libswscale-dev libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libavformat-dev libpq-dev
 
-RUN pip install numpy
+RUN \
+	source /opt/redislabs/lib/modules/python3/.venv/bin/activate ;\
+	pip install numpy
 
 WORKDIR /opt
 
@@ -61,6 +54,15 @@ RUN \
 RUN \
 	source /opt/redislabs/lib/modules/python3/.venv/bin/activate ;\
 	make install
+
+#----------------------------------------------------------------------------------------------
+FROM raffapen/redisai-arm:arm64-bionic as redisai
+FROM raffapen/redistimeseries-arm:arm64-bionic as redistimeseries
+FROM raffapen/redisgears-arm:arm64-bionic as redisgears
+
+# FROM redislabs/redisai-arm:cpu-arm64-bionic as redisai
+# FROM redislabs/redistimeseries:arm64-bionic as redistimeseries
+# FROM redislabs/redisgears:arm64-bionic as redisgears
 
 #----------------------------------------------------------------------------------------------
 FROM raffapen/redis-arm:arm64-bionic
