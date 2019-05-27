@@ -63,12 +63,18 @@ RUN \
 	cd opencv-${OPENCV_VERSION}/cmake_binary ;\
 	make install
 
+RUN \
+	source /opt/redislabs/lib/modules/python3/.venv/bin/activate ;\
+	apt-get install -y 	libjpeg-dev zlib1g-dev libtiff-dev ;\
+	pip3 install Pillow ;\
+	pip3 install imageio
+	
 #----------------------------------------------------------------------------------------------
 FROM raffapen/redisai-arm:arm64-bionic as ai
 FROM raffapen/redistimeseries-arm:arm64-bionic as timeseries
 
 # FROM redislabs/redisai-arm:cpu-arm64-bionic as sai
-# FROM redislabs/redistimeseries:arm64-bionic as timeseries
+# FROM redislabs/redistimeseries-arm:arm64-bionic as timeseries
 
 #----------------------------------------------------------------------------------------------
 FROM raffapen/redis-arm:arm64-bionic
