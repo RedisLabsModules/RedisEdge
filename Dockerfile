@@ -6,7 +6,7 @@ FROM raffapen/redis-arm:arm64-bionic as gears-opencv
 
 SHELL ["/bin/bash", "-c"]
 
-COPY --from=redisgears /opt/redislabs /opt/redislabs
+COPY --from=gears /opt/redislabs /opt/redislabs
 
 ENV OPENCV_VERSION="4.1.0"
 
