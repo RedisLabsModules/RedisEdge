@@ -4,7 +4,7 @@ ARG OSNICK=bionic
 # ARG ARCH=x64|arm64|arm7l
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redisai-${OSNICK}:latest as ai
+FROM raffapen/redisai-cpu-${OSNICK}:latest as ai
 FROM raffapen/redistimeseries-${OSNICK}:latest as timeseries 
 FROM raffapen/redisgears-${OSNICK}:latest as gears
 FROM raffapen/redisedgevisionlibs-${OSNICK}:latest as visionlibs

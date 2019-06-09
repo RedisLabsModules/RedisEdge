@@ -3,7 +3,7 @@
 ARG OSNICK=bionic
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redisai-${OSNICK}:latest as ai
+FROM raffapen/redisai-cpu-${OSNICK}:latest as ai
 FROM raffapen/redistimeseries-${OSNICK}:latest as timeseries 
 FROM raffapen/redisgears-${OSNICK}:latest as gears
 
