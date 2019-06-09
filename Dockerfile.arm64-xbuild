@@ -1,20 +1,24 @@
 # BUILD raffapen/redisedge-${ARCH}-${OSNICK}:latest
 
 ARG OSNICK=bionic
+ARCH=arm64
+# ARCH=arm64|arm7l
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redisai-${OSNICK}:latest as ai
-FROM raffapen/redistimeseries-${OSNICK}:latest as timeseries 
-FROM raffapen/redisgears-${OSNICK}:latest as gears
+FROM raffapen/redisai-${ARCH}-${OSNICK}:latest as ai
+FROM raffapen/redistimeseries-${ARCH}-${OSNICK}:latest as timeseries 
+FROM raffapen/redisgears-${ARCH}-${OSNICK}:latest as gears
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redis-${OSNICK}:5.0.5
+FROM raffapen/redis-${ARCH}-${OSNICK}-xbuild:5.0.5
+
+RUN [ "cross-build-start" ]
 
 RUN apt-get update; apt-get install -y libgomp1
 
 ENV LD_LIBRARY_PATH /usr/lib/redis/modules
 WORKDIR /data
-RUN mkdir -p ${LD_LIBRARY_PATH};
+RUN mkdir -p ${LD_LIBRARY_PATH}
 
 COPY --from=redistimeseries ${LD_LIBRARY_PATH}/*.so ${LD_LIBRARY_PATH}/
 COPY --from=redisai ${LD_LIBRARY_PATH}/*.so* ${LD_LIBRARY_PATH}/
@@ -25,3 +29,5 @@ CMD ["--loadmodule", "/usr/lib/redis/modules/redistimeseries.so", \
      "--loadmodule", "/usr/lib/redis/modules/redisai.so", \
      "--loadmodule", "/usr/lib/redis/modules/redisgears.so", \
      "PythonHomeDir", "/opt/redislabs/lib/modules/python3/"]
+
+RUN [ "cross-build-end" ]
