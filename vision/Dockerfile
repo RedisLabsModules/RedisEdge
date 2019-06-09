@@ -24,7 +24,10 @@ COPY --from=timeseries ${REDISMODULES_LIBS}/*.so ${REDISMODULES_LIBS}/
 COPY --from=ai         ${REDISMODULES_LIBS}/*.so* ${REDISMODULES_LIBS}/
 COPY --from=gears      /opt/redislabs/lib/modules/redisgears.so ${REDISMODULES_LIBS}/
 COPY --from=gears      /opt/redislabs/ /opt/redislabs/
-COPY --from=visionlibs /usr/local/ /usr/local/
+COPY --from=visionlibs /opt/redislabs/ /opt/redislabs/
+# COPY --from=visionlibs /usr/local/ /usr/local/
+
+RUN echo /opt/redislabs/edgevision/lib/python3.7/site-packages > /opt/redislabs/lib/modules/python3/.venv/lib/python3.7/site-packages/edgevision.pth
 
 CMD ["--loadmodule", "/usr/lib/redis/modules/redistimeseries.so", \
      "--loadmodule", "/usr/lib/redis/modules/redisai.so", \

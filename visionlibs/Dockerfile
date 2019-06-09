@@ -12,7 +12,7 @@ COPY deps/ deps/
 ADD visionlibs/system-setup.py .
 
 RUN ./deps/readies/bin/getpy2
-RUN ./system-setup.py
+RUN python2 system-setup.py
 
 ENV PYENV=/opt/redislabs/edgevision
 
