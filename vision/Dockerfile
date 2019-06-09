@@ -12,7 +12,11 @@ FROM raffapen/redisedgevisionlibs-${OSNICK}:latest as visionlibs
 #----------------------------------------------------------------------------------------------
 FROM raffapen/redis-${OSNICK}:5.0.5
 
-RUN apt-get update; apt-get install -y libgomp1
+COPY deps/ deps/
+ADD vision/system-setup.py .
+
+RUN ./deps/readies/bin/getpy2
+RUN python2 system-setup.py
 
 WORKDIR /data
 
