@@ -1,4 +1,4 @@
-# BUILD redislabs/redisedgevisionlibs-${ARCH}-${OSNICK}:latest
+# BUILD redisfab/redisedgevisionlibs-${ARCH}-${OSNICK}:latest
 
 FROM python:3.7
 

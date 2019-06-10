@@ -1,17 +1,17 @@
-# TAG raffapen/redisedgevision-${ARCH}-${OSNICK}:latest
+# BUILD redisfab/redisedgevision-${ARCH}-${OSNICK}:VERSION
 
 ARG OSNICK=bionic
 ARCH=arm64
 # ARG ARCH=x64|arm64|arm7l
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redisai-cpu-${ARCH}-${OSNICK}:latest as ai
-FROM raffapen/redistimeseries-${ARCH}-${OSNICK}:latest as timeseries 
-FROM raffapen/redisgears-${ARCH}-${OSNICK}:latest as gears
-FROM raffapen/redisedgevisionlibs-${ARCH}-${OSNICK}:latest as visionlibs
+FROM redisfab/redisai-cpu-${ARCH}-${OSNICK}:latest as ai
+FROM redisfab/redistimeseries-${ARCH}-${OSNICK}:latest as timeseries 
+FROM redisfab/redisgears-${ARCH}-${OSNICK}:latest as gears
+FROM redisfab/redisedgevisionlibs-${ARCH}-${OSNICK}:latest as visionlibs
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redis-${OSNICK}:5.0.5
+FROM redislabs/redis-${OSNICK}:5.0.5
 
 RUN [ "cross-build-start" ]
 

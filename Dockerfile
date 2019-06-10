@@ -1,14 +1,14 @@
-# BUILD raffapen/redisedge-${ARCH}-${OSNICK}:latest
+# BUILD redisfab/redisedge-${ARCH}-${OSNICK}:latest
 
 ARG OSNICK=bionic
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redisai-cpu-${OSNICK}:latest as ai
-FROM raffapen/redistimeseries-${OSNICK}:latest as timeseries 
-FROM raffapen/redisgears-${OSNICK}:latest as gears
+FROM redisfab/redisai-cpu-${OSNICK}:latest as ai
+FROM redisfab/redistimeseries-${OSNICK}:latest as timeseries
+FROM redisfab/redisgears-${OSNICK}:latest as gears
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redis-${OSNICK}:5.0.5
+FROM redislabs/redis-${OSNICK}:5.0.5
 
 RUN apt-get update; apt-get install -y libgomp1
 

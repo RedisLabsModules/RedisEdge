@@ -1,16 +1,16 @@
-# TAG raffapen/redisedgevision-${ARCH}-${OSNICK}:latest
+# TAG redisfab/redisedgevision-${ARCH}-${OSNICK}:VERSION
 
 ARG OSNICK=bionic
 # ARG ARCH=x64|arm64|arm7l
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redisai-cpu-${OSNICK}:latest as ai
-FROM raffapen/redistimeseries-${OSNICK}:latest as timeseries 
-FROM raffapen/redisgears-${OSNICK}:latest as gears
-FROM raffapen/redisedgevisionlibs-${OSNICK}:latest as visionlibs
+FROM redisfab/redisai-cpu-${OSNICK}:latest as ai
+FROM redisfab/redistimeseries-${OSNICK}:latest as timeseries 
+FROM redisfab/redisgears-${OSNICK}:latest as gears
+FROM redisfab/redisedgevisionlibs-${OSNICK}:latest as visionlibs
 
 #----------------------------------------------------------------------------------------------
-FROM raffapen/redis-${OSNICK}:5.0.5
+FROM redislabs/redis-${OSNICK}:5.0.5
 
 COPY deps/ deps/
 ADD vision/system-setup.py .
