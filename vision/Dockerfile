@@ -1,13 +1,13 @@
-# TAG redisfab/redisedgevision-${ARCH}-${OSNICK}:VERSION
+# BUILD redisfab/redisedgevision-${ARCH}-${OSNICK}:M.m.b
 
 ARG OSNICK=bionic
 # ARG ARCH=x64|arm64|arm7l
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${OSNICK}:latest as ai
-FROM redisfab/redistimeseries-${OSNICK}:latest as timeseries 
-FROM redisfab/redisgears-${OSNICK}:latest as gears
-FROM redisfab/redisedgevisionlibs-${OSNICK}:latest as visionlibs
+FROM redisfab/redisai-cpu-${OSNICK}:0.2.1 as ai
+FROM redisfab/redistimeseries-${OSNICK}:0.2.0 as timeseries 
+FROM redisfab/redisgears-${OSNICK}:0.3.1 as gears
+FROM redisfab/redisedgevisionlibs-${OSNICK}:0.1.1 as visionlibs
 
 #----------------------------------------------------------------------------------------------
 FROM redislabs/redis-${OSNICK}:5.0.5
@@ -29,7 +29,7 @@ COPY --from=ai         ${REDISMODULES_LIBS}/*.so* ${REDISMODULES_LIBS}/
 COPY --from=gears      /opt/redislabs/lib/modules/redisgears.so ${REDISMODULES_LIBS}/
 COPY --from=gears      /opt/redislabs/ /opt/redislabs/
 COPY --from=visionlibs /opt/redislabs/ /opt/redislabs/
-# COPY --from=visionlibs /usr/local/ /usr/local/
+COPY --from=visionlibs /usr/local/ /usr/local/
 
 RUN echo /opt/redislabs/edgevision/lib/python3.7/site-packages > /opt/redislabs/lib/modules/python3/.venv/lib/python3.7/site-packages/edgevision.pth
 

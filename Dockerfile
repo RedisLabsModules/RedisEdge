@@ -1,11 +1,11 @@
-# BUILD redisfab/redisedge-${ARCH}-${OSNICK}:latest
+# BUILD redisfab/redisedge-${ARCH}-${OSNICK}:M.m.b
 
 ARG OSNICK=bionic
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${OSNICK}:latest as ai
-FROM redisfab/redistimeseries-${OSNICK}:latest as timeseries
-FROM redisfab/redisgears-${OSNICK}:latest as gears
+FROM redisfab/redisai-cpu-${OSNICK}:0.2.1 as ai
+FROM redisfab/redistimeseries-${OSNICK}:0.2.0 as timeseries
+FROM redisfab/redisgears-${OSNICK}:0.3.1 as gears
 
 #----------------------------------------------------------------------------------------------
 FROM redislabs/redis-${OSNICK}:5.0.5

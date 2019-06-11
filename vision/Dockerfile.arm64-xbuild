@@ -1,14 +1,14 @@
-# BUILD redisfab/redisedgevision-${ARCH}-${OSNICK}:VERSION
+# BUILD redisfab/redisedgevision-${ARCH}-${OSNICK}:M.m.b
 
 ARG OSNICK=bionic
 ARCH=arm64
 # ARG ARCH=x64|arm64|arm7l
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${ARCH}-${OSNICK}:latest as ai
-FROM redisfab/redistimeseries-${ARCH}-${OSNICK}:latest as timeseries 
-FROM redisfab/redisgears-${ARCH}-${OSNICK}:latest as gears
-FROM redisfab/redisedgevisionlibs-${ARCH}-${OSNICK}:latest as visionlibs
+FROM redisfab/redisai-cpu-${ARCH}-${OSNICK}:0.2.1 as ai
+FROM redisfab/redistimeseries-${ARCH}-${OSNICK}:0.2.0 as timeseries 
+FROM redisfab/redisgears-${ARCH}-${OSNICK}:0.3.1 as gears
+FROM redisfab/redisedgevisionlibs-${ARCH}-${OSNICK}:0.1.1 as visionlibs
 
 #----------------------------------------------------------------------------------------------
 FROM redislabs/redis-${OSNICK}:5.0.5
