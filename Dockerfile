@@ -14,7 +14,7 @@ RUN apt-get update; apt-get install -y libgomp1
 
 ENV LD_LIBRARY_PATH /usr/lib/redis/modules
 WORKDIR /data
-RUN mkdir -p ${LD_LIBRARY_PATH};
+RUN mkdir -p ${LD_LIBRARY_PATH}
 
 COPY --from=timeseries ${LD_LIBRARY_PATH}/*.so ${LD_LIBRARY_PATH}/
 COPY --from=ai ${LD_LIBRARY_PATH}/*.so* ${LD_LIBRARY_PATH}/

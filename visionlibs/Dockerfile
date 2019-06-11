@@ -1,6 +1,9 @@
 # BUILD redisfab/redisedgevisionlibs-${ARCH}-${OSNICK}:M.m.b
 
 FROM python:3.7
+# The Python distribution is installed into /usr/local/bin.
+# The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
+# Any libraries built and installed here are installed into /usr/local/lib.
 
 SHELL ["/bin/bash", "-c"]
 
@@ -14,21 +17,13 @@ ADD visionlibs/system-setup.py .
 RUN ./deps/readies/bin/getpy2
 RUN python2 system-setup.py
 
-ENV PYENV=/opt/redislabs/edgevision
-
-RUN set -ex ;\
-	mkdir -p $PYENV ;\
-	virtualenv $PYENV
-
-RUN source $PYENV/bin/activate ;\
-	pip3 install numpy
+RUN pip3 install numpy
 
 RUN set -ex ;\
 	wget --quiet https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip ;\
 	unzip -q ${OPENCV_VERSION}.zip
 
-RUN source $PYENV/bin/activate ;\
-	mkdir -p opencv-${OPENCV_VERSION}/cmake_binary ;\
+RUN mkdir -p opencv-${OPENCV_VERSION}/cmake_binary ;\
 	cd opencv-${OPENCV_VERSION}/cmake_binary ;\
 	cmake \
 		-D BUILD_TIFF=ON \
@@ -58,15 +53,12 @@ RUN source $PYENV/bin/activate ;\
 		\
 		..
 
-RUN source $PYENV/bin/activate ;\
-	cd opencv-${OPENCV_VERSION}/cmake_binary ;\
+RUN cd opencv-${OPENCV_VERSION}/cmake_binary ;\
 	make -j`nproc`
 
-RUN source $PYENV/bin/activate ;\
-	cd opencv-${OPENCV_VERSION}/cmake_binary ;\
+RUN cd opencv-${OPENCV_VERSION}/cmake_binary ;\
 	make install
 
 RUN set -ex ;\
-	source $PYENV/bin/activate ;\
 	pip3 install Pillow ;\
 	pip3 install imageio
