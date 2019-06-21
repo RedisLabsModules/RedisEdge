@@ -1,3 +1,5 @@
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/redislabs/redisedge.svg)](https://hub.docker.com/r/redislabs/redisedge/builds/)
+
 # redisedge - a Docker image with select Redis Labs modules for the Edge
 
 This container image bundles together [Redis](https://redis.io) with Redis modules from [Redis Labs](https://redislabs.com) for Edge computing.
