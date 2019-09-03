@@ -1,17 +1,19 @@
-# BUILD redisfab/redisedgevision-${ARCH}-${OSNICK}:M.m.b
+# BUILD redisfab/redisedgevision-${OSNICK}:M.m.b-${ARCH}
 
-ARG OSNICK=bionic
-ARCH=arm64
-# ARG ARCH=x64|arm64|arm7l
+# OSNICK=stretch|bionic|buster
+ARG OSNICK=buster
 
-#----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${ARCH}-${OSNICK}:0.2.1 as ai
-FROM redisfab/redistimeseries-${ARCH}-${OSNICK}:0.2.0 as timeseries 
-FROM redisfab/redisgears-${ARCH}-${OSNICK}:0.3.1 as gears
-FROM redisfab/redisedgevisionlibs-${ARCH}-${OSNICK}:0.1.1 as visionlibs
+# ARCH=arm64v8|arm32v7
+ARG ARCH=arm64v8
 
 #----------------------------------------------------------------------------------------------
-FROM redislabs/redis-${OSNICK}:5.0.5
+FROM redisfab/redisai-cpu-${OSNICK}:0.3.1-${ARCH} as ai
+FROM redisfab/redistimeseries-${OSNICK}:1.0.1-${ARCH} as timeseries 
+FROM redisfab/redisgears-${OSNICK}:0.3.1-${ARCH} as gears
+FROM redisfab/redisedgevisionlibs-${OSNICK}:0.1.2-${ARCH} as visionlibs
+
+#----------------------------------------------------------------------------------------------
+FROM redisfab/redis-${ARCH}-${OSNICK}-xbuild:5.0.5
 
 RUN [ "cross-build-start" ]
 

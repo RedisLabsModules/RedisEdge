@@ -1,16 +1,19 @@
-# BUILD redisfab/redisedgevision-${ARCH}-${OSNICK}:M.m.b
+# BUILD redisfab/redisedgevision-${OSNICK}:M.m.b-${ARCH}
 
-ARG OSNICK=bionic
-# ARG ARCH=x64|arm64|arm7l
+# OSNICK=stretch|bionic|buster
+ARG OSNICK=buster
+
+# ARCH=x64|arm64v8|arm32v7
+ARG ARCH=x64
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${OSNICK}:0.2.1 as ai
-FROM redisfab/redistimeseries-${OSNICK}:0.2.0 as timeseries 
+FROM redisfab/redisai-cpu-${OSNICK}:0.3.1 as ai
+FROM redisfab/redistimeseries-${OSNICK}:1.0.1 as timeseries
 FROM redisfab/redisgears-${OSNICK}:0.3.1 as gears
-FROM redisfab/redisedgevisionlibs-${OSNICK}:0.1.1 as visionlibs
+FROM redisfab/redisedgevisionlibs-${OSNICK}:0.1.2 as visionlibs
 
 #----------------------------------------------------------------------------------------------
-FROM redislabs/redis-${OSNICK}:5.0.5
+FROM redisfab/redis-${ARCH}-${OSNICK}:5.0.5
 
 COPY deps/ deps/
 ADD vision/system-setup.py .

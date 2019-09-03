@@ -1,20 +1,32 @@
-#!/bin/sh
+#!/bin/bash
 
-[ ! -z $(command -v python) ] && exit 0
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+. $HERE/../shibumi/functions
+
+[ "$VERBOSE" = "1" ] && set -x
+
+if [ ! -z $(command -v python) ]; then
+	[ "$(python --version 2>&1 | cut -d" " -f2 | cut -d. -f1)" = "2" ] && exit 0
+fi
+
 [ ! -z $(command -v python2) ] && exit 0
+[ ! -z $(command -v python2.7) ] && exit 0
+
+[[ $CHECK == 1 ]] && exit 1
 
 if [ ! -z $(command -v apt-get) ]; then
-	apt-get update
-	apt-get install -y python
+	runn apt-get -qq update
+	runn apt-get -qq install -y python
 elif [ ! -z $(command -v dnf) ]; then
-	dnf install -y python2
+	runn dnf install -y python2
 elif [ ! -z $(command -v yum) ]; then
-	yum install -y python2
+	runn yum install -y python2
 elif [ ! -z $(command -v apk) ]; then
-	apk update
-	apk add python2
+	runn apk update
+	runn apk add python2
 elif [ ! -z $(command -v brew) ]; then
-	brew install python2
+	runn brew install python2
 fi
 
 if [ -z $(command -v python) ]; then

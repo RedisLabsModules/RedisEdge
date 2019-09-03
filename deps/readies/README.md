@@ -3,3 +3,7 @@
 Cetara: C/C++
 
 Paella: Python
+
+Shibumi: Bash
+
+mk: GNU Make

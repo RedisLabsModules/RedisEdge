@@ -49,13 +49,22 @@ class Platform:
             self.arch = 'x86'
         elif self.arch == 'aarch64':
             self.arch = 'arm64v8'
+        elif self.arch == 'armv7l':
+            self.arch = 'arm32v7'
 
     def is_debian_compat(self):
         return self.dist == 'debian' or self.dist == 'ubuntu'
     
     def is_redhat_compat(self):
         return self.dist == 'redhat' or self.dist == 'centos'
-    
+
+    def is_container(self):
+        with open('/proc/1/cgroups', 'r') as conf:
+            for line in conf:
+                if re.search('docker', line):
+                    return True
+        return False
+
     def report(self):
         print("This system is " + self.distname + " " + self.distver + ".\n")
 

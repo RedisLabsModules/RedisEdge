@@ -1,9 +1,19 @@
 # BUILD redisfab/redisedgevisionlibs-${OSNICK}:M.m.b-${ARCH}
 
-FROM python:3.7
+# OSNICK=stretch|bionic|buster
+ARG OSNICK=buster
+
+# ARCH=arm64v8|arm32v7
+ARG ARCH=arm64v8
+
+#----------------------------------------------------------------------------------------------
+FROM redisfab/arm64v8-xbuild:buster
+
 # The Python distribution is installed into /usr/local/bin.
 # The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
 # Any libraries built and installed here are installed into /usr/local/lib.
+
+RUN [ "cross-build-start" ]
 
 SHELL ["/bin/bash", "-c"]
 
@@ -62,3 +72,5 @@ RUN cd opencv-${OPENCV_VERSION}/cmake_binary ;\
 RUN set -ex ;\
 	pip3 install Pillow ;\
 	pip3 install imageio
+
+RUN [ "cross-build-end" ]
