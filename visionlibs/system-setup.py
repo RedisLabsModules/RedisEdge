@@ -1,8 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 import os
-import popen2
 import argparse
 
 # deps/readies in Docker filesystem terms
@@ -11,7 +10,7 @@ import paella
 
 #----------------------------------------------------------------------------------------------
 
-class RedisGearsSetup(paella.Setup):
+class RedisEdgeVisionLibsSetup(paella.Setup):
     def __init__(self, nop=False):
         paella.Setup.__init__(self, nop)
 
@@ -47,8 +46,8 @@ class RedisGearsSetup(paella.Setup):
 
 #----------------------------------------------------------------------------------------------
 
-parser = argparse.ArgumentParser(description='Set up system for RedisEdgeVision build.')
+parser = argparse.ArgumentParser(description='Set up system for RedisEdgeVisionLibs.')
 parser.add_argument('-n', '--nop', action="store_true", help='no operation')
 args = parser.parse_args()
 
-RedisGearsSetup(nop = args.nop).setup()
+RedisEdgeVisionLibsSetup(nop = args.nop).setup()

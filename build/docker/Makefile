@@ -11,8 +11,10 @@ endif
 all: edge vision
 
 edge:
+	@echo Building RedisEdge v$(VERSION) ...
 	$(MAKE) -C edge all
 
 vision:
+	@echo Building RedisEdgeVision v$(VERSION) ...
 	$(MAKE) -C visionlibs all
 	$(MAKE) -C vision all

@@ -8,6 +8,7 @@ ARG ARCH=arm64v8
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/${ARCH}-xbuild:${OSNICK}
+# FROM redisfab/redis-${ARCH}-${OSNICK}-xbuild:5.0.5
 
 # The Python distribution is installed into /usr/local/bin.
 # The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
@@ -15,7 +16,7 @@ FROM redisfab/${ARCH}-xbuild:${OSNICK}
 
 RUN [ "cross-build-start" ]
 
-SHELL ["/bin/bash", "-c"]
+# SHELL ["/bin/bash", "-c"]
 
 ENV OPENCV_VERSION="4.1.0"
 
@@ -25,9 +26,11 @@ COPY deps/ deps/
 ADD visionlibs/system-setup.py .
 
 RUN ./deps/readies/bin/getpy2
-RUN python2 system-setup.py
+RUN ./deps/readies/bin/getpy
+RUN python3 system-setup.py
 
-RUN pip3 install numpy
+# RUN pip3 install numpy
+RUN apt-get -q install -y python3-numpy
 
 RUN set -ex ;\
 	wget --quiet https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip ;\
