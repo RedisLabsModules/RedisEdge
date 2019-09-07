@@ -7,8 +7,8 @@ ARG OSNICK=buster
 ARG ARCH=x64
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${OSNICK}:0.3.1 as ai
-FROM redisfab/redistimeseries-${OSNICK}:1.0.1 as timeseries
+FROM redisfab/redisai-cpu-${OSNICK}:0.3.2 as ai
+FROM redisfab/redistimeseries-${OSNICK}:1.0.2 as timeseries
 FROM redisfab/redisgears-${OSNICK}:0.3.1 as gears
 FROM redisfab/redisedgevisionlibs-${OSNICK}:0.1.2 as visionlibs
 

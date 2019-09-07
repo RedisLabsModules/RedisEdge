@@ -5,6 +5,7 @@ import os
 import popen2
 import argparse
 
+# deps/readies in Docker filesystem terms
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "deps/readies"))
 import paella
 
