@@ -7,7 +7,7 @@ ARG OSNICK=buster
 ARG ARCH=arm64v8
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/arm64v8-xbuild:buster
+FROM redisfab/${ARCH}-xbuild:${OSNICK}
 
 # The Python distribution is installed into /usr/local/bin.
 # The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
