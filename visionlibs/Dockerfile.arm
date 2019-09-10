@@ -7,8 +7,7 @@ ARG OSNICK=buster
 ARG ARCH=arm64v8
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/${ARCH}-xbuild:${OSNICK}
-# FROM redisfab/redis-${ARCH}-${OSNICK}-xbuild:5.0.5
+FROM python:3.7-buster
 
 # The Python distribution is installed into /usr/local/bin.
 # The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
@@ -26,11 +25,9 @@ COPY deps/ deps/
 ADD visionlibs/system-setup.py .
 
 RUN ./deps/readies/bin/getpy2
-RUN ./deps/readies/bin/getpy
-RUN python3 system-setup.py
+RUN python2 system-setup.py
 
-# RUN pip3 install numpy
-RUN apt-get -q install -y python3-numpy
+RUN pip3 install numpy
 
 RUN set -ex ;\
 	wget --quiet https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip ;\

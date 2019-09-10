@@ -12,9 +12,22 @@ all: edge vision
 
 edge:
 	@echo Building RedisEdge v$(VERSION) ...
-	$(MAKE) -C edge all
+	$(MAKE) -C edge
 
 vision:
 	@echo Building RedisEdgeVision v$(VERSION) ...
-	$(MAKE) -C visionlibs all
-	$(MAKE) -C vision all
+	$(MAKE) -C vision
+
+visionlibs:
+	@echo Building RedisEdgeVision v$(VERSION) ...
+	$(MAKE) -C visionlibs
+
+build:
+	$(MAKE) -C edge build
+	$(MAKE) -C vision build
+
+publish:
+	$(MAKE) -C edge publish
+	$(MAKE) -C vision publish
+
+.PHONY: all edge vision visionlibs build publish

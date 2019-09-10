@@ -1,6 +1,6 @@
 # BUILD redisfab/redisedgevisionlibs-${OSNICK}:M.m.b-${ARCH}
 
-FROM python:3.7
+FROM python:3.7-buster
 # The Python distribution is installed into /usr/local/bin.
 # The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
 # Any libraries built and installed here are installed into /usr/local/lib.

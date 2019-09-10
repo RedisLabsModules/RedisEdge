@@ -7,7 +7,7 @@ ARG OSNICK=buster
 ARG ARCH=x64
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${OSNICK}:0.3.2 as ai
+FROM redisfab/redisai-cpu-${OSNICK}:0.3.1 as ai
 FROM redisfab/redistimeseries-${OSNICK}:1.0.2 as timeseries
 FROM redisfab/redisgears-${OSNICK}:0.3.1 as gears
 
@@ -23,7 +23,7 @@ WORKDIR /data
 RUN mkdir -p ${LIBDIR}
 
 COPY --from=timeseries ${LIBDIR}/*.so ${LIBDIR}/
-COPY --from=ai ${LIBDIR}/*.so* ${LIBDIR}/
+COPY --from=ai ${LIBDIR}/ ${LIBDIR}/
 COPY --from=gears /opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
 COPY --from=gears /opt/redislabs/ /opt/redislabs/
 
