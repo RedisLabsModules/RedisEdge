@@ -29,9 +29,7 @@ COPY --from=ai         ${LIBDIR}/ ${LIBDIR}/
 COPY --from=gears      /opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
 COPY --from=gears      /opt/redislabs/ /opt/redislabs/
 
-CMD ["--loadmodule", "/usr/lib/redis/modules/redistimeseries.so", \
-     "--loadmodule", "/usr/lib/redis/modules/redisai.so", \
-     "--loadmodule", "/usr/lib/redis/modules/redisgears.so", \
-     "PythonHomeDir", "/opt/redislabs/lib/modules/python3/"]
+ADD redisedge.conf /etc
+CMD ["/etc/redisedge.conf"]
 
 RUN [ "cross-build-end" ]

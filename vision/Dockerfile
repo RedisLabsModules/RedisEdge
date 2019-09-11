@@ -37,7 +37,5 @@ COPY --from=gears      /opt/redislabs/ /opt/redislabs/
 
 RUN echo /usr/lib/python3/dist-packages > /opt/redislabs/lib/modules/python3/.venv/lib/python3.7/site-packages/global.pth
 
-CMD ["--loadmodule", "/usr/lib/redis/modules/redistimeseries.so", \
-     "--loadmodule", "/usr/lib/redis/modules/redisai.so", \
-     "--loadmodule", "/usr/lib/redis/modules/redisgears.so", \
-     "PythonHomeDir", "/opt/redislabs/lib/modules/python3/"]
+ADD redisedge.conf /etc
+CMD ["/etc/redisedge.conf"]
