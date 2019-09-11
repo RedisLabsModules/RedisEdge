@@ -5,3 +5,5 @@ docker-compose*
 .gitignore
 README.md
 LICENSE
+/bin/
+/[0-9]*/
