@@ -1,4 +1,6 @@
-# BUILD redisfab/redisedge-${OSNICK}:M.m.b-${ARCH}
+# BUILD redisfab/redisedge-${OSNICK}:${VERSION}-${ARCH}
+
+ARG VERSION=0.1.0
 
 # OSNICK=stretch|bionic|buster
 ARG OSNICK=buster
@@ -6,13 +8,29 @@ ARG OSNICK=buster
 # ARCH=x64|arm64v8|arm32v7
 ARG ARCH=x64
 
+ARG REDISAI_VERSION=0.3.2
+ARG REDISTIMESERIES_VERSION=1.0.3
+ARG REDISGEARS_VERSION=0.4.0
+
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${OSNICK}:0.3.1 as ai
-FROM redisfab/redistimeseries-${OSNICK}:1.0.2 as timeseries
-FROM redisfab/redisgears-${OSNICK}:0.3.1 as gears
+FROM redisfab/redisai-cpu-${OSNICK}:${REDISAI_VERSION} as ai
+FROM redisfab/redistimeseries-${OSNICK}:${REDISTIMESERIES_VERSION} as timeseries
+FROM redisfab/redisgears-${OSNICK}:${REDISGEARS_VERSION} as gears
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redis-${ARCH}-${OSNICK}:5.0.5
+
+ARG OSNICK
+ARG ARCH
+ARG VERSION
+ARG REDISAI_VERSION
+ARG REDISTIMESERIES_VERSION
+ARG REDISGEARS_VERSION
+
+RUN echo "Building redisedge-${OSNICK}:${VERSION}-${ARCH} with:" ;\
+	echo "  RedisAI=${REDISAI_VERSION}" ;\
+	echo "  RedisTimeSeries=${REDISTIMESERIES_VERSION}" ;\
+	echo "  RedisGears=${REDISGEARS_VERSION}"
 
 RUN set -e ;\
 	apt-get -qq update; apt-get -q install -y libgomp1
@@ -23,9 +41,9 @@ WORKDIR /data
 RUN mkdir -p ${LIBDIR}
 
 COPY --from=timeseries ${LIBDIR}/*.so ${LIBDIR}/
-COPY --from=ai ${LIBDIR}/ ${LIBDIR}/
-COPY --from=gears /opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
-COPY --from=gears /opt/redislabs/ /opt/redislabs/
+COPY --from=ai         ${LIBDIR}/ ${LIBDIR}/
+COPY --from=gears      /opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
+COPY --from=gears      /opt/redislabs/ /opt/redislabs/
 
 ADD redisedge.conf /etc
 CMD ["/etc/redisedge.conf"]

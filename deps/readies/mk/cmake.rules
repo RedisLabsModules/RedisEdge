@@ -1,7 +1,7 @@
 
 ifneq ($(MK_CMAKE),)
 
-CMAKE_FILES ?= $(SRCDIR)/CMakeLists.txt
+MK_CMAKE_FILES ?= $(SRCDIR)/CMakeLists.txt
 
 $(BINDIR)/Makefile : bindirs $(MK_CMAKE_FILES)
 	$(SHOW)if [ ! -d $(BINDIR) ]; then echo "CMake: $(BINDIR) does not exist."; exit 1; fi
