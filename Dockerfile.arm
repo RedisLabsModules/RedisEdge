@@ -1,6 +1,6 @@
 # BUILD redisfab/redisedge-${OSNICK}:${VERSION}-${ARCH}
 
-ARG VERSION=0.1.0
+ARG VERSION=0.2.0
 
 # OSNICK=stretch|bionic|buster
 ARG OSNICK=buster
@@ -13,9 +13,9 @@ ARG REDISTIMESERIES_VERSION=1.0.3
 ARG REDISGEARS_VERSION=0.4.0
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${OSNICK}:${REDISAI_VERSION} as ai
-FROM redisfab/redistimeseries-${OSNICK}:${REDISTIMESERIES_VERSION} as timeseries
-FROM redisfab/redisgears-${OSNICK}:${REDISGEARS_VERSION} as gears
+FROM redisfab/redisai-cpu-${OSNICK}:${REDISAI_VERSION}-${ARCH} as ai
+FROM redisfab/redistimeseries-${OSNICK}:${REDISTIMESERIES_VERSION}-${ARCH} as timeseries
+FROM redisfab/redisgears-${OSNICK}:${REDISGEARS_VERSION}-${ARCH} as gears
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redis-${ARCH}-${OSNICK}-xbuild:5.0.5
