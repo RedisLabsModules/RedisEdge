@@ -1,5 +1,4 @@
 # BUILD redisfab/redisedge-${OSNICK}:${VERSION}-${ARCH}
-
 ARG VERSION=0.3.0
 
 # OSNICK=stretch|bionic|buster
