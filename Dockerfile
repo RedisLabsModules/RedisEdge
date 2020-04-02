@@ -1,6 +1,5 @@
 # BUILD redisfab/redisedge-${OSNICK}:${VERSION}-${ARCH}
-
-ARG VERSION=0.2.0
+ARG VERSION=0.3.0
 
 # OSNICK=stretch|bionic|buster
 ARG OSNICK=buster
@@ -8,9 +7,9 @@ ARG OSNICK=buster
 # ARCH=x64|arm64v8|arm32v7
 ARG ARCH=x64
 
-ARG REDISAI_VERSION=0.3.2
-ARG REDISTIMESERIES_VERSION=1.0.3
-ARG REDISGEARS_VERSION=0.4.0
+ARG REDISAI_VERSION=0.9.0
+ARG REDISTIMESERIES_VERSION=1.2.5
+ARG REDISGEARS_VERSION=0.9.0
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redisai-cpu-${OSNICK}:${REDISAI_VERSION}-${ARCH} as ai
@@ -18,7 +17,7 @@ FROM redisfab/redistimeseries-${OSNICK}:${REDISTIMESERIES_VERSION}-${ARCH} as ti
 FROM redisfab/redisgears-${OSNICK}:${REDISGEARS_VERSION}-${ARCH} as gears
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redis-${ARCH}-${OSNICK}:5.0.5
+FROM redisfab/redis-${ARCH}-${OSNICK}:5.0.8
 
 ARG OSNICK
 ARG ARCH
