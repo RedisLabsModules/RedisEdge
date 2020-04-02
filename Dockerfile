@@ -2,7 +2,7 @@
 ARG VERSION=0.3.0
 
 # OSNICK=stretch|bionic|buster
-ARG OSNICK=buster
+ARG OSNICK=bionic
 
 # ARCH=x64|arm64v8|arm32v7
 ARG ARCH=x64
