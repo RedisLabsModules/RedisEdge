@@ -46,3 +46,4 @@ COPY --from=gears      /opt/redislabs/ /opt/redislabs/
 
 ADD redisedge.conf /etc
 CMD ["/etc/redisedge.conf"]
+
