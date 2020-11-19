@@ -1,4 +1,4 @@
-# BUILD redisfab/redisedge:${VERSION}-${ARCH}-${OSNICK}
+# BUILD redisfab/redisedge:${VERSION}-cpu-${ARCH}-${OSNICK}
 
 ARG VERSION=0.4.0
 
@@ -8,16 +8,13 @@ ARG OSNICK=bionic
 # ARCH=x64|arm64v8|arm32v7
 ARG ARCH=x64
 
-# DEVICE=cpu|gpu
-ARG DEVICE=cpu
-
 ARG REDISAI_VERSION=1.0.2
 ARG REDISTIMESERIES_VERSION=1.4.6
 ARG REDISGEARS_VERSION=1.0.2
 ARG REDIS_VERSION=6.0.9
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai:${REDISAI_VERSION}-${DEVICE}-${ARCH}-${OSNICK} as ai
+FROM redisfab/redisai:${REDISAI_VERSION}-cpu-${ARCH}-${OSNICK} as ai
 FROM redisfab/redistimeseries:${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK} as timeseries
 FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
 
@@ -30,9 +27,10 @@ ARG VERSION
 ARG REDISAI_VERSION
 ARG REDISTIMESERIES_VERSION
 ARG REDISGEARS_VERSION
+ARG REDIS_VERSION
 
-RUN echo "Building redisedge-${OSNICK}:${VERSION}-${ARCH} with:" ;\
-    echo "  RedisAI=${REDISAI_VERSION}" ;\
+RUN echo "Building redisedge-${OSNICK}:${VERSION}-cpu-${ARCH} with:" ;\
+    echo "  RedisAI=${REDISAI_VERSION}-cpu" ;\
     echo "  RedisTimeSeries=${REDISTIMESERIES_VERSION}" ;\
     echo "  RedisGears=${REDISGEARS_VERSION}" ;\
     echo "  Redis=${REDIS_VERSION}"

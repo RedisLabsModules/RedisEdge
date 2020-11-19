@@ -28,8 +28,7 @@ commands:
           name: Build for platform
           command: |
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            make -C build/docker build OSNICK=<<parameters.platform>>
-            # make -C build/docker publish
+            make -C build/docker build publish OSNICK=<<parameters.platform>>
           no_output_timeout: 40m
 
 jobs:
@@ -59,7 +58,7 @@ jobs:
           command: |
             sudo docker login -u redisfab -p $DOCKER_REDISFAB_PWD
             make -C build/docker build
-            sudo make -C build/docker publish
+            make -C build/docker publish 
 
 
 on-any-branch: &on-any-branch
@@ -105,5 +104,5 @@ workflows:
           name: build-bionic
           platform: bionic
           <<: *on-any-branch
-      - build-multiarch-docker:
-          <<: *on-master
+      # - build-multiarch-docker:
+      #     <<: *on-master
