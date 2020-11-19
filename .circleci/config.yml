@@ -1,10 +1,65 @@
 version: 2.1
 
+commands:
+  setup-executor:
+    steps:
+      - run:
+          name: Setup executor
+          command: |
+            apt-get -qq update
+            apt-get -q install -y git openssh-client curl ca-certificates make tar gzip
+            bash <(curl -fsSL https://get.docker.com)
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+  platform-build-steps:
+    parameters:
+      platform:
+        type: string
+    steps:
+      - setup-executor
+      - checkout
+      - run:
+          name: Setup
+          command: |
+            git submodule update --init --recursive
+            ./deps/readies/bin/getpy2
+      - run:
+          name: Build for platform
+          command: |
+            docker login -u redisfab -p $DOCKER_REDISFAB_PWD
+            make -C build/docker build
+            # sudo make -C build/docker publish
+
+            # logs_d=pytest/logs/<<parameters.platform>>
+            # mkdir -p $logs_d
+            # tar -C $logs_d -xzf artifacts/pytest-logs*.tgz
+          no_output_timeout: 40m
+      # - store_artifacts:
+      #     path: pytest/logs
+      # - persist_to_workspace:
+      #     root: artifacts
+      #     paths:
+      #       - 'snapshot/*.zip'
+      #       - 'snapshot/*.tgz'
+      #       - 'release/*.zip'
+      #       - 'release/*.tgz'
+
 jobs:
+  platform-build:
+    parameters:
+      platform:
+        type: string
+    docker:
+      - image: debian:buster
+    steps:
+      - platform-build-steps:
+          platform: <<parameters.platform>>
+
   build-multiarch-docker:
     machine:
       enabled: true
-      image: ubuntu-1604:201903-01
+      image: cimg/base:2020.01
     steps:
       - checkout
       - run:
@@ -19,13 +74,49 @@ jobs:
             make -C build/docker build
             sudo make -C build/docker publish
 
+
+on-any-branch: &on-any-branch
+  filters:
+    branches:
+      only: /.*/
+    tags:
+      only: /.*/
+
+never: &never
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      ignore: /.*/
+
+on-master: &on-master
+  filters:
+    branches:
+      only: master
+
+on-version-tags: &on-version-tags
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only: /^v[0-9].*/
+
+on-master-and-version-tags: &on-master-and-version-tags
+  filters:
+    branches:
+      only:
+        - master
+    tags:
+      only: /^v[0-9].*/
+
+
 workflows:
   version: 2
-  build_and_package:
+  default_flow:
     jobs:
+      - platform-build:
+          name: build-buster
+          platform: buster
+          <<: *on-any-branch
       - build-multiarch-docker:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              only: master
+          <<: *on-master
