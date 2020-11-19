@@ -28,22 +28,9 @@ commands:
           name: Build for platform
           command: |
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            make -C build/docker build
-            # sudo make -C build/docker publish
-
-            # logs_d=pytest/logs/<<parameters.platform>>
-            # mkdir -p $logs_d
-            # tar -C $logs_d -xzf artifacts/pytest-logs*.tgz
+            make -C build/docker build OSNICK=<<parameters.platform>>
+            # make -C build/docker publish
           no_output_timeout: 40m
-      # - store_artifacts:
-      #     path: pytest/logs
-      # - persist_to_workspace:
-      #     root: artifacts
-      #     paths:
-      #       - 'snapshot/*.zip'
-      #       - 'snapshot/*.tgz'
-      #       - 'release/*.zip'
-      #       - 'release/*.tgz'
 
 jobs:
   platform-build:
@@ -115,7 +102,7 @@ workflows:
   default_flow:
     jobs:
       - platform-build:
-          name: build-buster
+          name: build-bionic
           platform: bionic
           <<: *on-any-branch
       - build-multiarch-docker:

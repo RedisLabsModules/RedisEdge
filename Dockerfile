@@ -35,7 +35,7 @@ RUN echo "Building redisedge-${OSNICK}:${VERSION}-${ARCH} with:" ;\
     echo "  RedisAI=${REDISAI_VERSION}" ;\
     echo "  RedisTimeSeries=${REDISTIMESERIES_VERSION}" ;\
     echo "  RedisGears=${REDISGEARS_VERSION}" ;\
-	echo "  Redis=${REDIS_VERSION}"
+    echo "  Redis=${REDIS_VERSION}"
 
 RUN set -e; if [ ! -z $(command -v apt-get) ]; then apt-get -qq update; apt-get -q install -y libgomp1; fi
 RUN set -e; if [ ! -z $(command -v yum) ]; then yum install -y libgomp; fi 
