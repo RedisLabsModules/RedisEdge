@@ -116,7 +116,7 @@ workflows:
     jobs:
       - platform-build:
           name: build-buster
-          platform: buster
+          platform: bionic
           <<: *on-any-branch
       - build-multiarch-docker:
           <<: *on-master
