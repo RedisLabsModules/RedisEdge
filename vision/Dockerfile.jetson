@@ -1,4 +1,4 @@
-# BUILD redisfab/redisedgevision:${VERSION}-${ARCH}-${OSNICK}
+# BUILD redisfab/redisedgevision:${VERSION}-jetson-${ARCH}-${OSNICK}
 
 ARG VERSION=0.4.0
 
@@ -8,22 +8,24 @@ ARG OSNICK=bionic
 # ARCH=x64|arm64v8|arm32v7
 ARG ARCH=x64
 
-# DEVICE=cpu|gpu
-ARG DEVICE=cpu
+# DEVICE=cpu|gpu|jetson10.2|cuda10.2-jetson
+ARG DEVICE=gpu
+
+ARG REDIS_VERSION=6.0.9
 
 ARG REDISAI_VERSION=1.0.2
 ARG REDISTIMESERIES_VERSION=1.4.6
-ARG REDISGEARS_VERSION=1.0.2
-ARG REDIS_VERSION=6.0.9
+ARG REDISGEARS_VERSION=1.0.3
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai:${REDISAI_VERSION}-${DEVICE}-${ARCH}-${OSNICK} as ai
+FROM redisfab/redisai:${REDISAI_VERSION}-jetson-${ARCH}-${OSNICK} as ai
 FROM redisfab/redistimeseries:${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK} as timeseries
 FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
-# FROM redisfab/redisedge-pylibs:${REDISEDGEPYLIBS_VERSION}-${ARCH}-${OSNICK} as visionlibs
+# FROM redisfab/redisedge-pylibs:${REDISEDGEPYLIBS_VERSION}-${ARCH}-${OSNICK} as pylibs
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redis:${REDIS_VERSION}-${ARCH}-${OSNICK}
+FROM redisfab/redis:${REDIS_VERSION}-${ARCH}-${OSNICK} as redis
+FROM redisfab/jetpack:4.4.1-l4t-arm64v8
 
 ARG OSNICK
 ARG ARCH
@@ -33,7 +35,7 @@ ARG REDISTIMESERIES_VERSION
 ARG REDISGEARS_VERSION
 ARG REDIS_VERSION
 
-RUN echo "Building redisedgevision-${OSNICK}:${VERSION}-${ARCH} with:" ;\
+RUN echo "Building redisedgevision:${VERSION}-jetson-${ARCH}-${OSNICK} with:" ;\
     echo "  RedisAI=${REDISAI_VERSION}" ;\
     echo "  RedisTimeSeries=${REDISTIMESERIES_VERSION}" ;\
     echo "  RedisGears=${REDISGEARS_VERSION}" ;\
@@ -53,15 +55,22 @@ ENV REDISMODULES_LIBS /usr/lib/redis/modules
 ENV LD_LIBRARY_PATH ${REDISMODULES_LIBS}:${LD_LIBRARY_PATH}
 RUN mkdir -p ${REDISMODULES_LIBS}
 
+COPY --from=redis      /usr/local/ /usr/local/
 COPY --from=timeseries ${REDISMODULES_LIBS}/*.so ${REDISMODULES_LIBS}/
 COPY --from=ai         ${REDISMODULES_LIBS}/ ${REDISMODULES_LIBS}/
 COPY --from=gears      /var/opt/redislabs/lib/modules/redisgears.so ${REDISMODULES_LIBS}/
 COPY --from=gears      /var/opt/redislabs/modules/ /var/opt/redislabs/modules/
 # COPY --from=visionlibs /usr/local/ /usr/local/
 
+# RUN set -e ;\
+#    mkdir -p /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages ;\
+#    echo /usr/lib/python3/dist-packages > /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages/global.pth
+	
 RUN set -e ;\
-    mkdir -p /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages ;\
-    echo /usr/lib/python3/dist-packages > /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages/global.pth
+    mkdir -p /var/opt/redislabs/modules/rg/python3/lib/python3.7/site-packages ;\
+	mkdir -p /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages ;\
+	echo /usr/local/lib/python3.7/site-packages > /var/opt/redislabs/modules/rg/python3/lib/python3.7/site-packages/local.pth ;\
+	echo /usr/local/lib/python3.7/site-packages > /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages/local.pth
 
 ADD redisedge.conf /etc
 ENTRYPOINT [ "/usr/local/bin/redis-server" ]

@@ -16,6 +16,9 @@ commands:
     parameters:
       platform:
         type: string
+      publish:
+        type: boolean
+        default: false
     steps:
       - setup-executor
       - checkout
@@ -28,7 +31,8 @@ commands:
           name: Build for platform
           command: |
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            make -C build/docker build publish OSNICK=<<parameters.platform>>
+            make -C build/docker build OSNICK=<<parameters.platform>>
+            <<# parameters.publish >> make -C build/docker publish OSNICK=<<parameters.platform>> <</ parameters.publish >>
           no_output_timeout: 40m
 
 jobs:
@@ -103,6 +107,7 @@ workflows:
       - platform-build:
           name: build-bionic
           platform: bionic
+          publish: false
           <<: *on-any-branch
       # - build-multiarch-docker:
       #     <<: *on-master

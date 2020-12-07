@@ -18,7 +18,7 @@ class RedisEdgeVisionSetup(paella.Setup):
         self.install("python3")
         
     def debian_compat(self):
-        self.install("python3-numpy python3-opencv python3-pil python3-imageio")
+        # self.install("python3-numpy python3-opencv python3-pil python3-imageio")
         self.install("libtbb2 zlib1g libgomp1")
         self.install("libjpeg62 libpng16-16 libtiff5")
         # self.install("libswscale5 libjpeg62-turbo libpng16-16 libtiff5 libavformat58 libilmbase23 libopenexr23")
