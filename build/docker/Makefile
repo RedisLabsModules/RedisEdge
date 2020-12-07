@@ -10,6 +10,10 @@ endif
  
 all: edge vision
 
+python:
+	@echo Building Python ...
+	$(MAKE) -C python
+
 edge:
 	@echo Building RedisEdge v$(VERSION) ...
 	$(MAKE) -C edge
@@ -18,7 +22,7 @@ vision:
 	@echo Building RedisEdgeVision v$(VERSION) ...
 	$(MAKE) -C vision
 
-visionlibs:
+pylibs:
 	@echo Building RedisEdgeVision v$(VERSION) ...
 	$(MAKE) -C visionlibs
 
