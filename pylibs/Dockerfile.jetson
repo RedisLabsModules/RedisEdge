@@ -27,7 +27,7 @@ SHELL ["/bin/bash", "-c"]
 
 WORKDIR /build
 
-ADD system-setup.py /build
+ADD pylibs/system-setup.py /build
 
 COPY --from=python /usr/local/ /usr/local/
 
