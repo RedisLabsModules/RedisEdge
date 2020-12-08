@@ -14,7 +14,7 @@ ARG ARCH=x64
 ARG PY_VER=3.7.2
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK}
+FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK} as builder
 
 # The Python distribution is installed into /usr/local/bin.
 # The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
@@ -75,5 +75,14 @@ RUN CMAKE_ARGS="\
 RUN set -ex ;\
     python3 -m pip install Pillow ;\
     python3 -m pip install imageio
+
+#----------------------------------------------------------------------------------------------
+FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK}
+
+COPY --from builder /usr/local/bin /usr/local/bin
+COPY --from builder /usr/local/include /usr/local/include
+COPY --from builder /usr/local/lib /usr/local/lib
+COPY --from builder /usr/local/man /usr/local/man
+COPY --from builder /usr/local/share /usr/local/share
 
 ENTRYPOINT ["/usr/local/bin/python3"]
