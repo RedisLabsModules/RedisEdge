@@ -16,6 +16,10 @@ ARG PY_VER=3.7.2
 #----------------------------------------------------------------------------------------------
 FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK} as builder
 
+ARG OSNICK
+ARG ARCH
+ARG PY_VER
+
 # The Python distribution is installed into /usr/local/bin.
 # The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
 # Any libraries built and installed here are installed into /usr/local/lib.
@@ -79,10 +83,10 @@ RUN set -ex ;\
 #----------------------------------------------------------------------------------------------
 FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK}
 
-COPY --from builder /usr/local/bin /usr/local/bin
-COPY --from builder /usr/local/include /usr/local/include
-COPY --from builder /usr/local/lib /usr/local/lib
-COPY --from builder /usr/local/man /usr/local/man
-COPY --from builder /usr/local/share /usr/local/share
+ARG OSNICK
+ARG ARCH
+ARG PY_VER
+
+COPY --from=builder /usr/local /usr/local
 
 ENTRYPOINT ["/usr/local/bin/python3"]
