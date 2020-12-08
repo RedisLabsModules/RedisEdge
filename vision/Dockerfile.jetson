@@ -25,7 +25,7 @@ FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redisedge-pylibs:${VERSION}-jetson-${ARCH}-${OSNICK} as pylibs
 FROM redisfab/redis:${REDIS_VERSION}-${ARCH}-${OSNICK} as redis
-FROM redisfab/jetpack:4.4.1-l4t-arm64v8
+FROM redisfab/jetpack:4.4.1-arm64v8-l4t
 
 ARG OSNICK
 ARG ARCH

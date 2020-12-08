@@ -3,19 +3,16 @@ ROOT=../../..
 include $(ROOT)/deps/readies/mk/main
 
 # OSNICK=buster|stretch|bionic
-OSNICK ?= buster
+OSNICK ?= bionic
 
 REPO=redisfab
-STEM=$(REPO)/redisedgevisionlibs
+STEM=$(REPO)/redisedge-pylibs
 
 DOCKERFILE_STEM=$(ROOT)/visionlibs/Dockerfile
 
 include ../versions
 
 DOCKER_BUILD_ARGS += \
-	VERSION=$(VERSION) \
-	REDISAI_VERSION=$(REDISAI_VERSION) \
-	REDISTIMESERIES_VERSION=$(REDISTIMESERIES_VERSION) \
-	REDISGEARS_VERSION=$(REDISGEARS_VERSION)
+	VERSION=$(VERSION)
 
 include $(MK)/docker

@@ -22,13 +22,19 @@ FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK}
 
 SHELL ["/bin/bash", "-c"]
 
-ENV OPENCV_VERSION="4.4.0"
+# ENV OPENCV_VERSION="4.4.0"
 
 WORKDIR /build
 
-COPY deps/ deps/
-ADD pylibs/system-setup.py .
+ADD pylibs/system-setup.py /build
 
+COPY --from=python /usr/local/ /usr/local/
+
+RUN set -e ;\
+    apt-get -qq update ;\
+    apt-get install -y git
+
+COPY deps/ deps/
 RUN python3 system-setup.py
 
 #----------------------------------------------------------------------------------------------
@@ -37,48 +43,39 @@ RUN python3 -m pip install numpy
 
 #----------------------------------------------------------------------------------------------
 
-RUN set -ex ;\
-    wget --quiet https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip ;\
-    unzip -q ${OPENCV_VERSION}.zip
+RUN git clone https://github.com/skvark/opencv-python.git
 
-RUN mkdir -p opencv-${OPENCV_VERSION}/cmake_binary ;\
-    cd opencv-${OPENCV_VERSION}/cmake_binary ;\
-    cmake \
-        -D BUILD_TIFF=ON \
-        -D BUILD_opencv_java=OFF \
-        -D WITH_CUDA=OFF \
-        -D WITH_OPENGL=ON \
-        -D WITH_OPENCL=ON \
-        -D WITH_IPP=ON \
-        -D WITH_TBB=ON \
-        -D WITH_EIGEN=ON \
-        -D WITH_V4L=ON \
-        -D BUILD_TESTS=OFF \
-        -D BUILD_PERF_TESTS=OFF \
-        \
-        -D CMAKE_BUILD_TYPE=RELEASE \
-        -D CMAKE_INSTALL_PREFIX=$(python3.7 -c "import sys; print(sys.prefix)") \
-        \
-        -D BUILD_PYTHON_SUPPORT=yes \
-        -D BUILD_NEW_PYTHON_SUPPORT=yes \
-        -D PYTHON_EXECUTABLE=$(which python3.7) \
-        -D PYTHON_INCLUDE_DIR=$(python3.7 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") \
-        -D PYTHON_PACKAGES_PATH=$(python3.7 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())") \
-        -D PYTHON_DEFAULT_EXECUTABLE=$(which python3.7) \
-        -D PYTHON_LIBRARY=$(python3 -c "from distutils.sysconfig import get_config_var;from os.path import dirname,join ; print(join(dirname(get_config_var('LIBPC')),get_config_var('LDLIBRARY')))") \
-        -D PYTHON3_NUMPY_INCLUDE_DIRS:PATH=$(python3.7 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")/numpy/core/include \
-        -D PYTHON3_PACKAGES_PATH=$(python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())") \
-        \
-        ..
+WORKDIR /build/opencv-python
 
-RUN cd opencv-${OPENCV_VERSION}/cmake_binary ;\
-    make -j`nproc`
-
-RUN cd opencv-${OPENCV_VERSION}/cmake_binary ;\
-    make install
+RUN CMAKE_ARGS="\
+       -DBUILD_EXAMPLES=OFF \
+       -DBUILD_opencv_python2=OFF \
+       -DBUILD_opencv_python3=ON \
+       -DCMAKE_BUILD_TYPE=RELEASE \
+       -DCMAKE_INSTALL_PREFIX=~/.local \
+       -DCUDA_ARCH_BIN=5.3,6.2,7.2 \
+       -DCUDA_ARCH_PTX= \
+       -DCUDA_FAST_MATH=ON \
+       -DCUDNN_VERSION='8.0' \
+       -DEIGEN_INCLUDE_PATH=/usr/include/eigen3 \
+       -DENABLE_NEON=OFF \
+       -DOPENCV_DNN_CUDA=OFF \
+       -DOPENCV_ENABLE_NONFREE=ON \
+       -DOPENCV_EXTRA_MODULES_PATH=/tmp/build_opencv/opencv_contrib/modules \
+       -DOPENCV_GENERATE_PKGCONFIG=ON \
+       -DWITH_CUBLAS=ON \
+       -DWITH_CUDA=OFF \
+       -DWITH_CUDNN=OFF \
+       -DWITH_GSTREAMER=ON \
+       -DWITH_LIBV4L=ON \
+       -DWITH_OPENGL=ON \
+	   " ;\
+    python3 -m pip install --no-binary opencv-python --progress-bar off opencv-python
 
 #----------------------------------------------------------------------------------------------
 
 RUN set -ex ;\
     python3 -m pip install Pillow ;\
     python3 -m pip install imageio
+
+ENTRYPOINT ["/usr/local/bin/python3"]
