@@ -6,7 +6,7 @@ ARG VERSION=0.4.0
 ARG OSNICK=bionic
 
 # ARCH=x64|arm64v8|arm32v7
-ARG ARCH=x64
+ARG ARCH=arm64v8
 
 # DEVICE=cpu|gpu|jetson10.2|cuda10.2-jetson
 ARG DEVICE=gpu
@@ -15,7 +15,7 @@ ARG REDIS_VERSION=6.0.9
 
 ARG REDISAI_VERSION=1.0.2
 ARG REDISTIMESERIES_VERSION=1.4.6
-ARG REDISGEARS_VERSION=1.0.3
+ARG REDISGEARS_VERSION=1.0.2
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redisai:${REDISAI_VERSION}-jetson-${ARCH}-${OSNICK} as ai
