@@ -8,7 +8,7 @@ OSNICK ?= bionic
 REPO=redisfab
 STEM=$(REPO)/redisedge-pylibs
 
-DOCKERFILE_STEM=$(ROOT)/visionlibs/Dockerfile
+DOCKERFILE_STEM=$(ROOT)/pylibs/Dockerfile
 
 include ../versions
 

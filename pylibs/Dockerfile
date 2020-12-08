@@ -28,8 +28,6 @@ WORKDIR /build
 
 ADD pylibs/system-setup.py /build
 
-COPY --from=python /usr/local/ /usr/local/
-
 RUN set -e ;\
     apt-get -qq update ;\
     apt-get install -y git
