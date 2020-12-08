@@ -24,7 +24,7 @@ FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redis:${REDIS_VERSION}-${ARCH}-${OSNICK} as redis
-FROM redisfab/jetpack:4.4.1-l4t-arm64v8
+FROM redisfab/jetpack:4.4.1-arm64v8-l4t
 
 ARG OSNICK
 ARG ARCH
@@ -54,8 +54,7 @@ COPY --from=timeseries ${REDISMODULES_LIBS}/*.so ${REDISMODULES_LIBS}/
 COPY --from=ai         ${REDISMODULES_LIBS}/ ${REDISMODULES_LIBS}/
 COPY --from=gears      /var/opt/redislabs/lib/modules/redisgears.so ${REDISMODULES_LIBS}/
 COPY --from=gears      /var/opt/redislabs/modules/ /var/opt/redislabs/modules/
-
-	
+		
 RUN set -e ;\
     mkdir -p /var/opt/redislabs/modules/rg/python3/lib/python3.7/site-packages ;\
 	mkdir -p /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages ;\

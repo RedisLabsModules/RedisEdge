@@ -1,4 +1,4 @@
-# BUILD redisfab/redisedgevisionlibs:${VERSION}-${ARCH}-${OSNICK}
+# BUILD redisfab/redisedge-pylibs:${VERSION}-${ARCH}-${OSNICK}
 
 ARG VERSION=0.4.0
 
@@ -6,27 +6,36 @@ ARG VERSION=0.4.0
 ARG OS=ubuntu:bionic
 
 # OSNICK=stretch|bionic|buster
-ARG OSNICK=buster
+ARG OSNICK=bionic
+
+# ARCH=x64|arm64v8
+ARG ARCH=x64
+
+ARG PY_VER=3.7.2
 
 #----------------------------------------------------------------------------------------------
-FROM python:3.7-buster
+FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK}
+
 # The Python distribution is installed into /usr/local/bin.
 # The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
 # Any libraries built and installed here are installed into /usr/local/lib.
 
 SHELL ["/bin/bash", "-c"]
 
-ENV OPENCV_VERSION="4.1.0"
+ENV OPENCV_VERSION="4.4.0"
 
 WORKDIR /build
 
 COPY deps/ deps/
-ADD visionlibs/system-setup.py .
+ADD pylibs/system-setup.py .
 
-RUN ./deps/readies/bin/getpy2
-RUN python2 system-setup.py
+RUN python3 system-setup.py
 
-RUN pip3 install numpy
+#----------------------------------------------------------------------------------------------
+
+RUN python3 -m pip install numpy
+
+#----------------------------------------------------------------------------------------------
 
 RUN set -ex ;\
     wget --quiet https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip ;\
@@ -68,6 +77,8 @@ RUN cd opencv-${OPENCV_VERSION}/cmake_binary ;\
 RUN cd opencv-${OPENCV_VERSION}/cmake_binary ;\
     make install
 
+#----------------------------------------------------------------------------------------------
+
 RUN set -ex ;\
-    pip3 install Pillow ;\
-    pip3 install imageio
+    python3 -m pip install Pillow ;\
+    python3 -m pip install imageio
