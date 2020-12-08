@@ -71,10 +71,21 @@ RUN CMAKE_ARGS="\
        -DWITH_LIBV4L=ON \
        -DWITH_OPENGL=ON \
 	   " ;\
-    python3 -m pip install --no-binary opencv-python
+    python3 -m pip install --no-binary opencv-python --progress-bar off opencv-python
 
 #----------------------------------------------------------------------------------------------
 
 RUN set -ex ;\
     python3 -m pip install Pillow ;\
     python3 -m pip install imageio
+
+#----------------------------------------------------------------------------------------------
+FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK}
+
+COPY --from builder /usr/local/bin /usr/local/bin
+COPY --from builder /usr/local/include /usr/local/include
+COPY --from builder /usr/local/lib /usr/local/lib
+COPY --from builder /usr/local/man /usr/local/man
+COPY --from builder /usr/local/share /usr/local/share
+
+ENTRYPOINT ["/usr/local/bin/python3"]
