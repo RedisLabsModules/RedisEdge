@@ -1,49 +1,50 @@
 # BUILD redisfab/redisedge-${OSNICK}:${VERSION}-${ARCH}
-ARG VERSION=0.3.0
-
-# OSNICK=stretch|bionic|buster
-ARG OSNICK=bionic
+ARG VERSION=latest
 
 # ARCH=x64|arm64v8|arm32v7
 ARG ARCH=x64
+ARG REDISAI_VARIANT=cpu
 
-ARG REDISAI_VERSION=0.9.0
-ARG REDISTIMESERIES_VERSION=1.2.5
-ARG REDISGEARS_VERSION=0.9.0
-
-#----------------------------------------------------------------------------------------------
-FROM redisfab/redisai-cpu-${OSNICK}:${REDISAI_VERSION}-${ARCH} as ai
-FROM redisfab/redistimeseries-${OSNICK}:${REDISTIMESERIES_VERSION}-${ARCH} as timeseries
-FROM redisfab/redisgears-${OSNICK}:${REDISGEARS_VERSION}-${ARCH} as gears
+ARG REDISAI_VERSION=edge
+ARG REDISTIMESERIES_VERSION=edge
+ARG REDISGEARS_VERSION=edge
+ARG REDIS_VERSION=latest
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redis-${ARCH}-${OSNICK}:5.0.8
+FROM redislabs/redisai:${REDISAI_VERSION}-${REDISAI_VARIANT} as ai
+FROM redislabs/redistimeseries:${REDISTIMESERIES_VERSION} as timeseries
+FROM redislabs/redisgears:${REDISGEARS_VERSION} as gears
+FROM redislabs/redis:${REDIS_VERSION} as redis
 
-ARG OSNICK
-ARG ARCH
+#----------------------------------------------------------------------------------------------
+FROM redislabs/redis:${REDIS_VERSION}
+
 ARG VERSION
 ARG REDISAI_VERSION
 ARG REDISTIMESERIES_VERSION
 ARG REDISGEARS_VERSION
 
-RUN echo "Building redisedge-${OSNICK}:${VERSION}-${ARCH} with:" ;\
-	echo "  RedisAI=${REDISAI_VERSION}" ;\
-	echo "  RedisTimeSeries=${REDISTIMESERIES_VERSION}" ;\
-	echo "  RedisGears=${REDISGEARS_VERSION}"
+USER root
+ADD /sudoers.txt /etc/sudoers
+RUN chmod 440 /etc/sudoers
+RUN echo "Building redisedge with RedisAI=${REDISAI_VERSION}  RedisTimeSeries=${REDISTIMESERIES_VERSION} RedisGears=${REDISGEARS_VERSION}"
+RUN id
 
 RUN set -e ;\
-	apt-get -qq update; apt-get -q install -y libgomp1
+	sudo apt-get -qq update && sudo apt-get -q install -y libgomp1
 
 ENV LIBDIR /usr/lib/redis/modules
 ENV LD_LIBRARY_PATH $LIBDIR
 WORKDIR /data
-RUN mkdir -p ${LIBDIR}
+RUN sudo mkdir -p ${LIBDIR}
 
 COPY --from=timeseries ${LIBDIR}/*.so ${LIBDIR}/
 COPY --from=ai         ${LIBDIR}/ ${LIBDIR}/
-COPY --from=gears      /opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
-COPY --from=gears      /opt/redislabs/ /opt/redislabs/
+COPY --from=gears      /var/opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
+COPY --from=gears      /var/opt/redislabs/ /opt/redislabs/
 
 ADD redisedge.conf /etc
-CMD ["/etc/redisedge.conf"]
+CMD sudo rm -f /etc/sudoers
 
+USER redislabs
+CMD ["/etc/redisedge.conf"]
