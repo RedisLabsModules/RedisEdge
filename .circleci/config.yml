@@ -15,6 +15,7 @@ jobs:
     resource_class: small
     steps:
       - checkout
+      - setup_remote_docker
       - build_x64
 
 on-any-branch: &on-any-branch
