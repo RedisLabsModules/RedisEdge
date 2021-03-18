@@ -6,7 +6,7 @@ commands:
       - run:
           name: Build RedisEdge x64
           command: |
-            docker build -f Dockerfile.x64 .
+            docker build .
 
 jobs:
   build_edge_docker:
