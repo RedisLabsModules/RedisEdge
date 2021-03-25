@@ -5,7 +5,9 @@ import os
 import argparse
 
 # deps/readies in Docker filesystem terms
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "deps/readies"))
+HERE = ROOT = os.path.abspath(os.path.dirname(__file__))
+READIES = os.path.join(ROOT, "deps/readies")
+sys.path.insert(0, READIES)
 import paella
 
 #----------------------------------------------------------------------------------------------
@@ -15,16 +17,15 @@ class RedisEdgeVisionLibsSetup(paella.Setup):
         paella.Setup.__init__(self, nop)
 
     def common_first(self):
-        self.install("wget unzip git")
-        self.install("cmake yasm")
+        self.install("wget unzip git openssl")
+        self.install("yasm")
 
-        self.setup_pip()
         self.pip_install("wheel")
         self.pip_install("setuptools --upgrade")
         self.pip_install("virtualenv")
         
     def debian_compat(self):
-        self.install("build-essential")
+        self.run("%s/bin/getgcc" % READIES)
         self.install("pkg-config")
         self.install("libtbb2 libtbb-dev")
         self.install("zlib1g-dev")
@@ -37,12 +38,12 @@ class RedisEdgeVisionLibsSetup(paella.Setup):
     def fedora(self):
         pass
 
-    def macosx(self):
+    def macos(self):
         pass
 
     def common_last(self):
+        self.run("%s/bin/getcmake" % READIES)
         # self.pip_install("numpy")
-        pass
 
 #----------------------------------------------------------------------------------------------
 

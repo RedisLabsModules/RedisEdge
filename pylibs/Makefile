@@ -15,4 +15,4 @@ include ../versions
 DOCKER_BUILD_ARGS += \
 	VERSION=$(VERSION)
 
-include $(MK)/docker
+include $(MK)/docker.native

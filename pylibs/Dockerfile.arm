@@ -14,7 +14,11 @@ ARG ARCH=arm64v8
 ARG PY_VER=3.7.2
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK}
+FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK} as builder
+
+ARG OSNICK
+ARG ARCH
+ARG PY_VER
 
 # The Python distribution is installed into /usr/local/bin.
 # The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
@@ -29,12 +33,6 @@ RUN [ "cross-build-start" ]
 WORKDIR /build
 
 ADD pylibs/system-setup.py /build
-
-COPY --from=python /usr/local/ /usr/local/
-
-RUN set -e ;\
-    apt-get -qq update ;\
-    apt-get install -y git
 
 COPY deps/ deps/
 RUN python3 system-setup.py

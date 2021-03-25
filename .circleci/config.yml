@@ -40,11 +40,15 @@ jobs:
     parameters:
       platform:
         type: string
+      publish:
+        type: boolean
+        default: false
     docker:
       - image: debian:buster
     steps:
       - platform-build-steps:
           platform: <<parameters.platform>>
+          publish: <<parameters.publish>>
 
   build-multiarch-docker:
     machine:

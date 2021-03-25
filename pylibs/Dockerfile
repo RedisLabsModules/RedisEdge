@@ -32,10 +32,6 @@ WORKDIR /build
 
 ADD pylibs/system-setup.py /build
 
-RUN set -e ;\
-    apt-get -qq update ;\
-    apt-get install -y git
-
 COPY deps/ deps/
 RUN python3 system-setup.py
 
@@ -71,7 +67,7 @@ RUN CMAKE_ARGS="\
        -DWITH_GSTREAMER=ON \
        -DWITH_LIBV4L=ON \
        -DWITH_OPENGL=ON \
-	   " ;\
+       " ;\
     python3 -m pip install --no-binary opencv-python --progress-bar off opencv-python
 
 #----------------------------------------------------------------------------------------------
