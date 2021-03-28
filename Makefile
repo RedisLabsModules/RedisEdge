@@ -43,10 +43,12 @@ pylibs:
 
 build:
 	@$(MAKE) -C edge build
+	@$(MAKE) -C pylibs build
 	@$(MAKE) -C vision build
 
 publish:
 	@$(MAKE) -C edge publish
+	@$(MAKE) -C pylibs publish
 	@$(MAKE) -C vision publish
 
 .PHONY: all edge vision pylibs build publish help

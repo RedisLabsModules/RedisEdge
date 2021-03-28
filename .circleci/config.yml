@@ -93,5 +93,5 @@ workflows:
       - platform-build:
           name: build-bionic
           platform: bionic
-          publish: false
+          publish: true
           <<: *on-any-branch
