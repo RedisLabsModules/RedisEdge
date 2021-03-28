@@ -1,12 +1,11 @@
 
-ROOT=../../..
+ROOT=..
 include $(ROOT)/deps/readies/mk/main
 
 # OSNICK=buster|stretch|bionic
 OSNICK ?= bionic
 
-REPO=redisfab
-STEM=$(REPO)/redisedgevision
+REPO=redisedgevision
 
 ifeq ($(JETSON),1)
 DOCKER_SUFFIX=.jetson

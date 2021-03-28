@@ -11,7 +11,7 @@ ARG ARCH=arm64v8
 # DEVICE=cpu|gpu|jetson10.2|cuda10.2-jetson
 ARG DEVICE=gpu
 
-ARG REDIS_VERSION=6.0.9
+ARG REDIS_VER=6.0.9
 
 ARG REDISAI_VERSION=1.0.2
 ARG REDISTIMESERIES_VERSION=1.4.6
@@ -23,7 +23,7 @@ FROM redisfab/redistimeseries:${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK} as ti
 FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redis:${REDIS_VERSION}-${ARCH}-${OSNICK} as redis
+FROM redisfab/redis:${REDIS_VER}-${ARCH}-${OSNICK} as redis
 FROM redisfab/jetpack:4.4.1-arm64v8-l4t
 
 ARG OSNICK
@@ -32,13 +32,13 @@ ARG VERSION
 ARG REDISAI_VERSION
 ARG REDISTIMESERIES_VERSION
 ARG REDISGEARS_VERSION
-ARG REDIS_VERSION
+ARG REDIS_VER
 
 RUN echo "Building redisedge:${VERSION}-jetson-${ARCH}-${OSNICK} with:" ;\
     echo "  RedisAI=${REDISAI_VERSION}" ;\
     echo "  RedisTimeSeries=${REDISTIMESERIES_VERSION}" ;\
     echo "  RedisGears=${REDISGEARS_VERSION}" ;\
-    echo "  Redis=${REDIS_VERSION}"
+    echo "  Redis=${REDIS_VER}"
 
 RUN set -e; if [ ! -z $(command -v apt-get) ]; then apt-get -qq update; apt-get -q install -y libgomp1; fi
 RUN set -e; if [ ! -z $(command -v yum) ]; then yum install -y libgomp; fi 

@@ -9,7 +9,7 @@ description: |
   on a variety of edge devices and sensors ranging from ARM32 to x64-based hardware. RedisEdge bundles
   open source Redis (version 5 with Redis Streams) with the RedisAI and RedisTimeSeries modules, along
   with RedisGears for inter-module communication.
-icon: snap/local/assets/1_Redis-labs-logoRGB.png
+icon: build/snap/local/assets/1_Redis-labs-logoRGB.png
 
 epoch: 0
 
@@ -34,10 +34,10 @@ passthrough:
   hooks:
     configure:
       command-chain:
-      - snap/command-chain/snapcraft-runner
+      - build/snap/command-chain/snapcraft-runner
     install:
       command-chain:
-      - snap/command-chain/snapcraft-runner
+      - build/snap/command-chain/snapcraft-runner
 
 grade: stable
 confinement: strict
@@ -68,7 +68,7 @@ parts:
     plugin: nil
     source: .
     override-pull: |
-      snapcraftctl set-version $(cat $SNAPCRAFT_PROJECT_DIR/VERSION)-$(date +%Y%m%d)+$(git rev-parse --short HEAD)
+      snapcraftctl set-version $(cat $SNAPCRAFT_PROJECT_DIR/build/snap/VERSION)-$(date +%Y%m%d)+$(git rev-parse --short HEAD)
 
   curl:
     plugin: nil
@@ -79,19 +79,19 @@ parts:
     # rebuilding, even though this part really only depends on a stage-package
     # to resolve this we can just specify the source of something that changes
     # infrequently and will minimize unnecessary part re-building by snapcraft
-    source: snap/local/build-helpers
+    source: build/snap/local/build-helpers
     stage-packages:
       - curl
   
   jq:
     plugin: nil
-    source: snap/local/build-helpers
+    source: build/snap/local/build-helpers
     stage-packages:
       - jq
 
   config-common:
     plugin: dump
-    source: snap/local/runtime-helpers
+    source: build/snap/local/runtime-helpers
 
   redis:
     source: https://github.com/antirez/redis.git

@@ -26,13 +26,13 @@ commands:
           name: Setup
           command: |
             git submodule update --init --recursive
-            ./deps/readies/bin/getpy2
+            ./deps/readies/bin/getpy3
       - run:
           name: Build for platform
           command: |
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            make -C build/docker build OSNICK=<<parameters.platform>>
-            <<# parameters.publish >> make -C build/docker publish OSNICK=<<parameters.platform>> <</ parameters.publish >>
+            make build OSNICK=<<parameters.platform>>
+            <<# parameters.publish >> make publish OSNICK=<<parameters.platform>> <</ parameters.publish >>
           no_output_timeout: 40m
 
 jobs:
@@ -49,24 +49,6 @@ jobs:
       - platform-build-steps:
           platform: <<parameters.platform>>
           publish: <<parameters.publish>>
-
-  build-multiarch-docker:
-    machine:
-      enabled: true
-      image: cimg/base:2020.01
-    steps:
-      - checkout
-      - run:
-          name: Setup Docker client experimental features
-          command: |
-            sudo ./deps/readies/bin/getdocker --just-enable-exp
-            docker version
-      - run:
-          name: Build
-          command: |
-            sudo docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            make -C build/docker build
-            make -C build/docker publish 
 
 
 on-any-branch: &on-any-branch
@@ -113,5 +95,3 @@ workflows:
           platform: bionic
           publish: false
           <<: *on-any-branch
-      # - build-multiarch-docker:
-      #     <<: *on-master

@@ -15,7 +15,7 @@ class RedisEdgeVisionSetup(paella.Setup):
         paella.Setup.__init__(self, nop)
 
     def common_first(self):
-        self.install("python3")
+        pass
         
     def debian_compat(self):
         # self.install("python3-numpy python3-opencv python3-pil python3-imageio")
@@ -35,7 +35,7 @@ class RedisEdgeVisionSetup(paella.Setup):
     def fedora(self):
         pass
 
-    def macosx(self):
+    def macos(self):
         pass
 
     def common_last(self):

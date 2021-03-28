@@ -1,18 +1,17 @@
 
-ROOT=../../..
+ROOT=..
 include $(ROOT)/deps/readies/mk/main
 
 # OSNICK=buster|stretch|bionic
 OSNICK ?= bionic
 
-REPO=redisfab
-STEM=$(REPO)/redisedge
+REPO=redisedge
 
 ifeq ($(JETSON),1)
 DOCKER_SUFFIX=.jetson
 endif
 
-DOCKERFILE_STEM=$(ROOT)/vision/Dockerfile$(DOCKER_SUFFIX)
+DOCKERFILE_STEM=$(ROOT)/edge/Dockerfile$(DOCKER_SUFFIX)
 
 include ../versions
 
