@@ -47,9 +47,9 @@ build:
 	@$(MAKE) -C vision build
 
 publish:
-	@$(MAKE) -C edge publish
-	@$(MAKE) -C pylibs publish
-	@$(MAKE) -C vision publish
+	@$(MAKE) -C edge publish PUSH_GENERAL=1
+	@$(MAKE) -C pylibs publish PUSH_GENERAL=1
+	@$(MAKE) -C vision publish PUSH_GENERAL=1
 
 .PHONY: all edge vision pylibs build publish help
 
