@@ -1,0 +1,88 @@
+# BUILD redisfab/redisedge-pylibs:${VERSION}-${ARCH}-${OSNICK}
+
+ARG VERSION=0.4.0
+
+# OS=debian:buster-slim|debian:stretch-slim|ubuntu:bionic|ubuntu:focal
+ARG OS=ubuntu:bionic
+
+# OSNICK=stretch|bionic|buster
+ARG OSNICK=bionic
+
+# ARCH=x64|arm64v8
+ARG ARCH=x64
+
+ARG PY_VER=3.7.2
+
+#----------------------------------------------------------------------------------------------
+FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK} as builder
+
+ARG OSNICK
+ARG ARCH
+ARG PY_VER
+
+# The Python distribution is installed into /usr/local/bin.
+# The Python interpreter uses libpython3.7m.so.1.0, which is installed into /usr/local/lib.
+# Any libraries built and installed here are installed into /usr/local/lib.
+
+SHELL ["/bin/bash", "-c"]
+
+# ENV OPENCV_VERSION="4.4.0"
+
+WORKDIR /build
+
+ADD pylibs/system-setup.py /build
+
+COPY deps/ deps/
+RUN python3 system-setup.py
+
+#----------------------------------------------------------------------------------------------
+
+RUN python3 -m pip install numpy
+
+#----------------------------------------------------------------------------------------------
+
+RUN git clone https://github.com/skvark/opencv-python.git
+
+WORKDIR /build/opencv-python
+
+RUN CMAKE_ARGS="\
+       -DBUILD_EXAMPLES=OFF \
+       -DBUILD_opencv_python2=OFF \
+       -DBUILD_opencv_python3=ON \
+       -DCMAKE_BUILD_TYPE=RELEASE \
+       -DCMAKE_INSTALL_PREFIX=~/.local \
+       -DCUDA_ARCH_BIN=5.3,6.2,7.2 \
+       -DCUDA_ARCH_PTX= \
+       -DCUDA_FAST_MATH=ON \
+       -DCUDNN_VERSION='8.0' \
+       -DEIGEN_INCLUDE_PATH=/usr/include/eigen3 \
+       -DENABLE_NEON=OFF \
+       -DOPENCV_DNN_CUDA=OFF \
+       -DOPENCV_ENABLE_NONFREE=ON \
+       -DOPENCV_EXTRA_MODULES_PATH=/tmp/build_opencv/opencv_contrib/modules \
+       -DOPENCV_GENERATE_PKGCONFIG=ON \
+       -DWITH_CUBLAS=ON \
+       -DWITH_CUDA=OFF \
+       -DWITH_CUDNN=OFF \
+       -DWITH_GSTREAMER=ON \
+       -DWITH_LIBV4L=ON \
+       -DWITH_OPENGL=ON \
+       " ;\
+    python3 -m pip install --no-binary opencv-python --progress-bar off opencv-python
+
+#----------------------------------------------------------------------------------------------
+
+RUN set -ex ;\
+    python3 -m pip install Pillow ;\
+    python3 -m pip install imageio
+
+#----------------------------------------------------------------------------------------------
+FROM redisfab/python:${PY_VER}-${ARCH}-${OSNICK}
+
+ARG OSNICK
+ARG ARCH
+ARG PY_VER
+
+COPY --from=builder /usr/local /usr/local
+
+ENTRYPOINT ["/usr/local/bin/python3"]

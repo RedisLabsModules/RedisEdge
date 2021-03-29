@@ -1,9 +1,9 @@
-# BUILD redisfab/redisedgevision:${VERSION}-${ARCH}-${OSNICK}
+# BUILD redisfab/redisedge:${VERSION}-${ARCH}-${OSNICK}
 
 ARG VERSION=0.4.0
 
 # OSNICK=stretch|bionic|buster
-ARG OSNICK=buster
+ARG OSNICK=bionic
 
 # ARCH=arm64v8|arm32v7
 ARG ARCH=arm64v8
@@ -20,7 +20,6 @@ ARG REDIS_VER=6.0.9
 FROM redisfab/redisai:${REDISAI_VERSION}-${DEVICE}-${ARCH}-${OSNICK} as ai
 FROM redisfab/redistimeseries:${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK} as timeseries
 FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
-# FROM redisfab/redisedgevisionlibs-${OSNICK}:${REDISEDGEVISIONLIBS_VERSION}-${ARCH} as visionlibs
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redis-xbuild:${REDIS_VER}-${ARCH}-${OSNICK}
@@ -34,35 +33,24 @@ ARG REDISAI_VERSION
 ARG REDISTIMESERIES_VERSION
 ARG REDISGEARS_VERSION
 
-RUN echo "Building redisedgevision-${OSNICK}:${VERSION}-${ARCH} with:" ;\
+RUN echo "Building redisedge-${OSNICK}:${VERSION}-${ARCH} with:" ;\
     echo "  RedisAI=${REDISAI_VERSION}" ;\
     echo "  RedisTimeSeries=${REDISTIMESERIES_VERSION}" ;\
     echo "  RedisGears=${REDISGEARS_VERSION}" ;\
     echo "  Redis=${REDIS_VER}"
 
-WORKDIR /tmp
+RUN set -e; if [ ! -z $(command -v apt-get) ]; then apt-get -qq update; apt-get -q install -y libgomp1; fi
+RUN set -e; if [ ! -z $(command -v yum) ]; then yum install -y libgomp; fi 
 
-COPY deps/ deps/
-ADD vision/system-setup.py .
-
-RUN ./deps/readies/bin/getpy3
-RUN ./system-setup.py 
-
+ENV LIBDIR /usr/lib/redis/modules
+ENV LD_LIBRARY_PATH $LIBDIR
 WORKDIR /data
+RUN mkdir -p ${LIBDIR}
 
-ENV REDISMODULES_LIBS /usr/lib/redis/modules
-ENV LD_LIBRARY_PATH ${REDISMODULES_LIBS}:${LD_LIBRARY_PATH}
-RUN mkdir -p ${REDISMODULES_LIBS}
-
-COPY --from=timeseries ${REDISMODULES_LIBS}/*.so ${REDISMODULES_LIBS}/
-COPY --from=ai         ${REDISMODULES_LIBS}/ ${REDISMODULES_LIBS}/
-COPY --from=gears      /var/opt/redislabs/lib/modules/redisgears.so ${REDISMODULES_LIBS}/
+COPY --from=timeseries ${LIBDIR}/*.so ${LIBDIR}/
+COPY --from=ai         ${LIBDIR}/ ${LIBDIR}/
+COPY --from=gears      /var/opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
 COPY --from=gears      /var/opt/redislabs/modules/ /var/opt/redislabs/modules/
-# COPY --from=visionlibs /usr/local/ /usr/local/
-
-RUN set -e ;\
-    mkdir -p /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages ;\
-    echo /usr/lib/python3/dist-packages > /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages/global.pth
 
 ADD redisedge.conf /etc
 CMD ["/etc/redisedge.conf"]

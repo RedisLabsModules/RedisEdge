@@ -1,31 +1,97 @@
 version: 2.1
 
-jobs:
-  build-multiarch-docker:
-    machine:
-      enabled: true
-      image: ubuntu-1604:201903-01
+commands:
+  setup-executor:
     steps:
+      - run:
+          name: Setup executor
+          command: |
+            apt-get -qq update
+            apt-get -q install -y git openssh-client curl ca-certificates make tar gzip
+            bash <(curl -fsSL https://get.docker.com)
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+  platform-build-steps:
+    parameters:
+      platform:
+        type: string
+      publish:
+        type: boolean
+        default: false
+    steps:
+      - setup-executor
       - checkout
       - run:
-          name: Setup Docker client experimental features
+          name: Setup
           command: |
-            sudo ./deps/readies/bin/getdocker --just-enable-exp
-            docker version
+            git submodule update --init --recursive
+            ./deps/readies/bin/getpy3
       - run:
-          name: Build
+          name: Build for platform
           command: |
-            sudo docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            make -C build/docker build
-            sudo make -C build/docker publish
+            docker login -u redisfab -p $DOCKER_REDISFAB_PWD
+            make build OSNICK=<<parameters.platform>>
+            <<# parameters.publish >> make publish OSNICK=<<parameters.platform>> <</ parameters.publish >>
+          no_output_timeout: 40m
+
+jobs:
+  platform-build:
+    parameters:
+      platform:
+        type: string
+      publish:
+        type: boolean
+        default: false
+    docker:
+      - image: debian:buster
+    steps:
+      - platform-build-steps:
+          platform: <<parameters.platform>>
+          publish: <<parameters.publish>>
+
+
+on-any-branch: &on-any-branch
+  filters:
+    branches:
+      only: /.*/
+    tags:
+      only: /.*/
+
+never: &never
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      ignore: /.*/
+
+on-master: &on-master
+  filters:
+    branches:
+      only: master
+
+on-version-tags: &on-version-tags
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only: /^v[0-9].*/
+
+on-master-and-version-tags: &on-master-and-version-tags
+  filters:
+    branches:
+      only:
+        - master
+    tags:
+      only: /^v[0-9].*/
+
 
 workflows:
   version: 2
-  build_and_package:
+  default_flow:
     jobs:
-      - build-multiarch-docker:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              only: master
+      - platform-build:
+          name: build-bionic
+          platform: bionic
+          publish: true
+          <<: *on-any-branch
