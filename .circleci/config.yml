@@ -105,10 +105,10 @@ workflows:
   edge_dailies:
     triggers:
       - schedule:
-        cron: "2 9,18 * * *"
-        filters:
-          branches:  # TODO change back to master, this is testing only
-            only: ck-redisai-633
+          cron: "2 9,18 * * *"
+          filters:
+            branches:  # TODO change back to master, this is testing only
+              only: ck-redisai-633
     jobs:
       - platform-build:
           name: build-edge
