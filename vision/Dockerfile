@@ -16,10 +16,15 @@ ARG REDISTIMESERIES_VERSION=1.4.6
 ARG REDISGEARS_VERSION=1.0.2
 ARG REDIS_VER=6.2.1
 
+# done to specifically allow for ease of optional override with --build-arg
+ARG REDISAI_DOCKERDEP=${REDISAI_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
+ARG REDISTIMESERIES_DOCKERDEP=${REDISTIMESERIES_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
+ARG REDISGEARS_DOCKERDEP=${REDISGEARS_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
+
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai:${REDISAI_VERSION}-${DEVICE}-${ARCH}-${OSNICK} as ai
-FROM redisfab/redistimeseries:${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK} as timeseries
-FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
+FROM redisfab/redisai:${REDISAI_DOCKERDEP} as ai
+FROM redislabs/redistimeseries:${REDISTIMESERIES_DOCKERDEP} as timeseries
+FROM redislabs/redisgears:${REDISGEARS_DOCKERDEP} as gears
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redisedge-pylibs:${VERSION}-${ARCH}-${OSNICK} as pylibs
@@ -39,7 +44,7 @@ RUN echo "Building redisedgevision:${VERSION}-${ARCH}-${OSNICK} with:" ;\
     echo "  RedisGears=${REDISGEARS_VERSION}" ;\
     echo "  Redis=${REDIS_VER}"
 
-	
+
 COPY --from=pylibs /usr/local/ /usr/local/
 
 WORKDIR /tmp
@@ -48,7 +53,7 @@ COPY deps/ deps/
 ADD vision/system-setup.py .
 
 RUN ./deps/readies/bin/getpy3
-RUN ./system-setup.py 
+RUN ./system-setup.py
 
 WORKDIR /data
 
@@ -64,7 +69,7 @@ COPY --from=gears      /var/opt/redislabs/modules/ /var/opt/redislabs/modules/
 # RUN set -e ;\
 #    mkdir -p /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages ;\
 #    echo /usr/lib/python3/dist-packages > /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages/global.pth
-	
+
 RUN set -e ;\
     mkdir -p /var/opt/redislabs/modules/rg/python3/lib/python3.7/site-packages ;\
 	mkdir -p /var/opt/redislabs/modules/rg/python3/.venv/lib/python3.7/site-packages ;\

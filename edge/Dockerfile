@@ -12,14 +12,21 @@ ARG REDISAI_VERSION=1.0.2
 ARG REDISTIMESERIES_VERSION=1.4.6
 ARG REDISGEARS_VERSION=1.0.2
 ARG REDIS_VER=6.0.9
+ARG DEVICE=cpu
+
+# done to specifically allow for ease of optional override with --build-arg
+ARG REDISAI_DOCKERDEP=${REDISAI_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
+ARG REDISTIMESERIES_DOCKERDEP=${REDISTIMESERIES_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
+ARG REDISGEARS_DOCKERDEP=${REDISGEARS_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
+ARG REDIS_DOCKERDEP=${REDIS_VER}-${ARCH}-${OSNICK}
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai:${REDISAI_VERSION}-cpu-${ARCH}-${OSNICK} as ai
-FROM redisfab/redistimeseries:${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK} as timeseries
-FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
+FROM redisfab/redisai:${REDISAI_DOCKERDEP} as ai
+FROM redislabs/redistimeseries:${REDISTIMESERIES_DOCKERDEP} as timeseries
+FROM redislabs/redisgears:${REDISGEARS_DOCKERDEP} as gears
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redis:${REDIS_VER}-${ARCH}-${OSNICK}
+FROM redisfab/redis:${REDIS_DOCKERDEP}
 
 ARG OSNICK
 ARG ARCH
@@ -28,15 +35,20 @@ ARG REDISAI_VERSION
 ARG REDISTIMESERIES_VERSION
 ARG REDISGEARS_VERSION
 ARG REDIS_VER
+ARG DEVICE
+ARG REDISTIMESERIES_DOCKERDEP
+ARG REDISGEARS_DOCKERDEP
+ARG REDISAI_DOCKERDEP
+ARG REDIS_DOCKERDEP
 
-RUN echo "Building redisedge-${OSNICK}:${VERSION}-cpu-${ARCH} with:" ;\
-    echo "  RedisAI=${REDISAI_VERSION}-cpu" ;\
-    echo "  RedisTimeSeries=${REDISTIMESERIES_VERSION}" ;\
-    echo "  RedisGears=${REDISGEARS_VERSION}" ;\
-    echo "  Redis=${REDIS_VER}"
+RUN echo "Building redisedge-${OSNICK}:${VERSION}-${DEVICE}-${ARCH} with:" ;\
+    echo "  RedisAI=${REDISAI_DOCKERDEP}" ;\
+    echo "  RedisTimeSeries=${REDISTIMESERIES_DOCKERDEP}" ;\
+    echo "  RedisGears=${REDISGEARS_DOCKERDEP}" ;\
+    echo "  Redis=${REDIS_DOCKERDEP}"
 
 RUN set -e; if [ ! -z $(command -v apt-get) ]; then apt-get -qq update; apt-get -q install -y libgomp1; fi
-RUN set -e; if [ ! -z $(command -v yum) ]; then yum install -y libgomp; fi 
+RUN set -e; if [ ! -z $(command -v yum) ]; then yum install -y libgomp; fi
 
 ENV LIBDIR /usr/lib/redis/modules
 ENV LD_LIBRARY_PATH $LIBDIR
