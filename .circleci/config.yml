@@ -107,8 +107,8 @@ workflows:
       - schedule:
           cron: "2 9,18 * * *"
           filters:
-            branches:  # TODO change back to master, this is testing only
-              only: ck-redisai-633
+            branches:
+              only: master
     jobs:
       - platform-build:
           name: build-edge
