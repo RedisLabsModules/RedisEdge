@@ -112,6 +112,6 @@ workflows:
     jobs:
       - platform-build:
           name: build-edge
-          platform: xenial
+          platform: bionic
           publish: true
           edge: REDISGEARS_DOCKERDEP=edge REDISTIMESERIES_DOCKERDEP=edge VERSION=edge REDISAI_DOCKERDEP=1.2.2-cpu-x64-xenial PUSH_EDGE=1

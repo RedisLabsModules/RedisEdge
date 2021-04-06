@@ -14,35 +14,36 @@ ARG DEVICE=cpu
 ARG REDISAI_VERSION=1.0.2
 ARG REDISTIMESERIES_VERSION=1.4.6
 ARG REDISGEARS_VERSION=1.0.2
-ARG REDIS_VER=6.2.1
+ARG REDIS_VERSION=6.2.1
 
 # done to specifically allow for ease of optional override with --build-arg
 ARG REDISAI_DOCKERDEP=${REDISAI_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
-ARG REDISTIMESERIES_DOCKERDEP=${REDISTIMESERIES_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
-ARG REDISGEARS_DOCKERDEP=${REDISGEARS_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
+ARG REDISTIMESERIES_DOCKERDEP=${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK}
+ARG REDISGEARS_DOCKERDEP=${REDISGEARS_VERSION}-${ARCH}-${OSNICK}
+ARG REDIS_DOCKERDEP=${REDIS_VERSION}-${ARCH}-${OSNICK}
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redisai:${REDISAI_DOCKERDEP} as ai
-FROM redislabs/redistimeseries:${REDISTIMESERIES_DOCKERDEP} as timeseries
-FROM redislabs/redisgears:${REDISGEARS_DOCKERDEP} as gears
+FROM redisfab/redistimeseries:${REDISTIMESERIES_DOCKERDEP} as timeseries
+FROM redisfab/redisgears:${REDISGEARS_DOCKERDEP} as gears
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redisedge-pylibs:${VERSION}-${ARCH}-${OSNICK} as pylibs
-FROM redisfab/redis:${REDIS_VER}-${ARCH}-${OSNICK}
+FROM redisfab/redis:${REDIS_DOCKERDEP}
 
 ARG OSNICK
 ARG ARCH
 ARG VERSION
-ARG REDISAI_VERSION
-ARG REDISTIMESERIES_VERSION
-ARG REDISGEARS_VERSION
-ARG REDIS_VER
+ARG REDISAI_DOCKERDEP
+ARG REDISTIMESERIES_DOCKERDEP
+ARG REDISGEARS_DOCKERDEP
+ARG REDIS_DOCKERDEP
 
 RUN echo "Building redisedgevision:${VERSION}-${ARCH}-${OSNICK} with:" ;\
-    echo "  RedisAI=${REDISAI_VERSION}" ;\
-    echo "  RedisTimeSeries=${REDISTIMESERIES_VERSION}" ;\
-    echo "  RedisGears=${REDISGEARS_VERSION}" ;\
-    echo "  Redis=${REDIS_VER}"
+    echo "  RedisAI=${REDISAI_DOCKERDEP}" ;\
+    echo "  RedisTimeSeries=${REDISTIMESERIES_DOCKERDEP}" ;\
+    echo "  RedisGears=${REDISGEARS_DOCKERDEP}" ;\
+    echo "  Redis=${REDIS_DOCKERDEP}"
 
 
 COPY --from=pylibs /usr/local/ /usr/local/
