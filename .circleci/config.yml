@@ -19,6 +19,9 @@ commands:
       publish:
         type: boolean
         default: false
+      edge:
+        type: string
+        default: ""
     steps:
       - setup-executor
       - checkout
@@ -32,7 +35,7 @@ commands:
           command: |
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
             make build OSNICK=<<parameters.platform>>
-            <<# parameters.publish >> make publish OSNICK=<<parameters.platform>> <</ parameters.publish >>
+            <<# parameters.publish >> make publish OSNICK=<<parameters.platform>> <<parameters.edge>> <</ parameters.publish >>
           no_output_timeout: 40m
 
 jobs:
@@ -43,13 +46,16 @@ jobs:
       publish:
         type: boolean
         default: false
+      edge:
+        type: string
+        default: ""
     docker:
       - image: debian:buster
     steps:
       - platform-build-steps:
           platform: <<parameters.platform>>
           publish: <<parameters.publish>>
-
+          edge: <<parameters.edge>>
 
 on-any-branch: &on-any-branch
   filters:
@@ -95,3 +101,17 @@ workflows:
           platform: bionic
           publish: true
           <<: *on-any-branch
+
+  edge_dailies:
+    triggers:
+      - schedule:
+          cron: "2 9,18 * * *"
+          filters:
+            branches:
+              only: master
+    jobs:
+      - platform-build:
+          name: build-edge
+          platform: bionic
+          publish: true
+          edge: REDISGEARS_DOCKERDEP=edge REDISTIMESERIES_DOCKERDEP=edge VERSION=edge REDISAI_DOCKERDEP=1.2.2-cpu-x64-xenial PUSH_EDGE=1
