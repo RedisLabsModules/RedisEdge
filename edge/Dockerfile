@@ -23,9 +23,9 @@ ARG REDISGEARS_DOCKERDEP=${REDISGEARS_VERSION}-${ARCH}-${OSNICK}
 ARG REDIS_DOCKERDEP=${REDIS_VER}-${ARCH}-${OSNICK}
 
 #----------------------------------------------------------------------------------------------
-FROM redislabs/redisai:${REDISAI_DOCKERDEP} as ai
-FROM redislabs/redistimeseries:${REDISTIMESERIES_DOCKERDEP} as timeseries
-FROM redislabs/redisgears:${REDISGEARS_DOCKERDEP} as gears
+FROM ${DOCKER_ORG}/redisai:${REDISAI_DOCKERDEP} as ai
+FROM ${DOCKER_ORG}/redistimeseries:${REDISTIMESERIES_DOCKERDEP} as timeseries
+FROM ${DOCKER_ORG}/redisgears:${REDISGEARS_DOCKERDEP} as gears
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redis:${REDIS_DOCKERDEP}
