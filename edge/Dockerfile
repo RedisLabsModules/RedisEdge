@@ -14,6 +14,8 @@ ARG REDISGEARS_VERSION=1.0.2
 ARG REDIS_VER=6.0.9
 ARG DEVICE=cpu
 
+ARG DOCKER_ORG=redisfab
+
 # done to specifically allow for ease of optional override with --build-arg
 ARG REDISAI_DOCKERDEP=${REDISAI_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
 ARG REDISTIMESERIES_DOCKERDEP=${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK}
@@ -21,9 +23,9 @@ ARG REDISGEARS_DOCKERDEP=${REDISGEARS_VERSION}-${ARCH}-${OSNICK}
 ARG REDIS_DOCKERDEP=${REDIS_VER}-${ARCH}-${OSNICK}
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai:${REDISAI_VERSION}-cpu-${ARCH}-${OSNICK} as ai
-FROM redisfab/redistimeseries:${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK} as timeseries
-FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
+FROM redislabs/redisai:${REDISAI_DOCKERDEP} as ai
+FROM redislabs/redistimeseries:${REDISTIMESERIES_DOCKERDEP} as timeseries
+FROM redislabs/redisgears:${REDISGEARS_DOCKERDEP} as gears
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redis:${REDIS_DOCKERDEP}
@@ -35,6 +37,10 @@ ARG REDISAI_VERSION
 ARG REDISTIMESERIES_VERSION
 ARG REDISGEARS_VERSION
 ARG REDIS_VER
+ARG REDISTIMESERIES_DOCKERDEP
+ARG REDISGEARS_DOCKERDEP
+ARG REDIS_DOCKERDEP
+ARG REDISAI_DOCKERDEP
 
 RUN echo "Building redisedge-${OSNICK}:${VERSION}-${DEVICE}-${ARCH} with:" ;\
     echo "  RedisAI=${REDISAI_DOCKERDEP}-${DEVICE}" ;\

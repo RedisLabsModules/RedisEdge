@@ -43,4 +43,11 @@ DOCKER_BUILD_ARGS += \
 	REDIS_DOCKERDEP=$(REDIS_DOCKERDEP)
 endif
 
+ifdef DOCKER_ORG
+DOCKER_BUILD_ARGS += \
+	DOCKER_ORG=$(DOCKER_ORG)
+endif
+
+
+
 include $(MK)/docker.native
