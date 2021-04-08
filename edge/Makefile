@@ -4,7 +4,7 @@ MK.pyver:=3
 include $(ROOT)/deps/readies/mk/main
 
 # OSNICK=buster|stretch|bionic
-OSNICK ?= bionic
+OSNICK ?= bionic # buster
 
 REPO=redisedge
 
@@ -42,5 +42,12 @@ ifdef REDIS_DOCKERDEP
 DOCKER_BUILD_ARGS += \
 	REDIS_DOCKERDEP=$(REDIS_DOCKERDEP)
 endif
+
+ifdef DOCKER_ORG
+DOCKER_BUILD_ARGS += \
+	DOCKER_ORG=$(DOCKER_ORG)
+endif
+
+
 
 include $(MK)/docker.native

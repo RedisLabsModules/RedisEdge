@@ -19,9 +19,6 @@ commands:
       publish:
         type: boolean
         default: false
-      edge:
-        type: string
-        default: ""
     steps:
       - setup-executor
       - checkout
@@ -35,7 +32,28 @@ commands:
           command: |
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
             make build OSNICK=<<parameters.platform>>
-            <<# parameters.publish >> make publish OSNICK=<<parameters.platform>> <<parameters.edge>> <</ parameters.publish >>
+            <<# parameters.publish >> make publish OSNICK=<<parameters.platform>> <</ parameters.publish >>
+          no_output_timeout: 40m
+
+  edge-build-steps:
+    parameters:
+      platform:
+        type: string
+    steps:
+      - setup-executor
+      - checkout
+      - run:
+          name: Setup
+          command: |
+            git submodule update --init --recursive
+            ./deps/readies/bin/getpy3
+      - run:
+          name: Build for platform
+          command: |
+            docker login -u redisfab -p $DOCKER_REDISFAB_PWD
+            for i in cpu gpu; do
+              make -C edge build publish OSNICK=<<parameters.platform>> PUSH_EDGE=1 DOCKER_ORG=redislabs REDISGEARS_DOCKERDEP=edge REDISTIMESERIES_DOCKERDEP=edge REDISAI_DOCKERDEP=edge-$i VERSION=edge VARIANT=x64-$i
+            done
           no_output_timeout: 40m
 
 jobs:
@@ -46,16 +64,22 @@ jobs:
       publish:
         type: boolean
         default: false
-      edge:
-        type: string
-        default: ""
     docker:
       - image: debian:buster
     steps:
       - platform-build-steps:
           platform: <<parameters.platform>>
           publish: <<parameters.publish>>
-          edge: <<parameters.edge>>
+
+  edge-build:
+    parameters:
+      platform:
+        type: string
+    docker:
+      - image: debian:buster
+    steps:
+      - edge-build-steps:
+          platform: <<parameters.platform>>
 
 on-any-branch: &on-any-branch
   filters:
@@ -113,5 +137,3 @@ workflows:
       - platform-build:
           name: build-edge
           platform: bionic
-          publish: true
-          edge: REDISGEARS_DOCKERDEP=edge REDISTIMESERIES_DOCKERDEP=edge VERSION=edge REDISAI_DOCKERDEP=1.2.2-cpu-x64-xenial PUSH_EDGE=1

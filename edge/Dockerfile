@@ -11,8 +11,10 @@ ARG ARCH=x64
 ARG REDISAI_VERSION=1.0.2
 ARG REDISTIMESERIES_VERSION=1.4.6
 ARG REDISGEARS_VERSION=1.0.2
-ARG REDIS_VER=6.0.9
+ARG REDIS_VER=6.2.1
 ARG DEVICE=cpu
+
+ARG DOCKER_ORG=redisfab
 
 # done to specifically allow for ease of optional override with --build-arg
 ARG REDISAI_DOCKERDEP=${REDISAI_VERSION}-${DEVICE}-${ARCH}-${OSNICK}
@@ -21,9 +23,9 @@ ARG REDISGEARS_DOCKERDEP=${REDISGEARS_VERSION}-${ARCH}-${OSNICK}
 ARG REDIS_DOCKERDEP=${REDIS_VER}-${ARCH}-${OSNICK}
 
 #----------------------------------------------------------------------------------------------
-FROM redisfab/redisai:${REDISAI_VERSION}-cpu-${ARCH}-${OSNICK} as ai
-FROM redisfab/redistimeseries:${REDISTIMESERIES_VERSION}-${ARCH}-${OSNICK} as timeseries
-FROM redisfab/redisgears:${REDISGEARS_VERSION}-${ARCH}-${OSNICK} as gears
+FROM ${DOCKER_ORG}/redisai:${REDISAI_DOCKERDEP} as ai
+FROM ${DOCKER_ORG}/redistimeseries:${REDISTIMESERIES_DOCKERDEP} as timeseries
+FROM ${DOCKER_ORG}/redisgears:${REDISGEARS_DOCKERDEP} as gears
 
 #----------------------------------------------------------------------------------------------
 FROM redisfab/redis:${REDIS_DOCKERDEP}
@@ -35,6 +37,10 @@ ARG REDISAI_VERSION
 ARG REDISTIMESERIES_VERSION
 ARG REDISGEARS_VERSION
 ARG REDIS_VER
+ARG REDISTIMESERIES_DOCKERDEP
+ARG REDISGEARS_DOCKERDEP
+ARG REDIS_DOCKERDEP
+ARG REDISAI_DOCKERDEP
 
 RUN echo "Building redisedge-${OSNICK}:${VERSION}-${DEVICE}-${ARCH} with:" ;\
     echo "  RedisAI=${REDISAI_DOCKERDEP}-${DEVICE}" ;\
@@ -42,18 +48,21 @@ RUN echo "Building redisedge-${OSNICK}:${VERSION}-${DEVICE}-${ARCH} with:" ;\
     echo "  RedisGears=${REDISGEARS_DOCKERDEP}" ;\
     echo "  Redis=${REDIS_DOCKERDEP}"
 
-RUN set -e; if [ ! -z $(command -v apt-get) ]; then apt-get -qq update; apt-get -q install -y libgomp1; fi
-RUN set -e; if [ ! -z $(command -v yum) ]; then yum install -y libgomp; fi
+RUN set -e; if [ ! -z $(command -v apt-get) ]; then apt-get -qq update; apt-get -q install -y libgomp1 git; fi
+RUN set -e; if [ ! -z $(command -v yum) ]; then yum install -y libgomp git; fi
 
 ENV LIBDIR /usr/lib/redis/modules
 ENV LD_LIBRARY_PATH $LIBDIR
 WORKDIR /data
 RUN mkdir -p ${LIBDIR}
 
-COPY --from=timeseries ${LIBDIR}/*.so ${LIBDIR}/
-COPY --from=ai         ${LIBDIR}/ ${LIBDIR}/
-COPY --from=gears      /var/opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
-COPY --from=gears      /var/opt/redislabs/modules/ /var/opt/redislabs/modules/
+COPY --from=timeseries --chown=redis:redis ${LIBDIR}/*.so ${LIBDIR}/
+COPY --from=ai --chown=redis:redis ${LIBDIR}/ ${LIBDIR}/
+COPY --from=gears --chown=redis:redis /var/opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
+COPY --from=gears --chown=redis:redis /var/opt/redislabs/modules/ /var/opt/redislabs/modules/
+
+WORKDIR /var/opt/redislabs/modules/rg
+RUN ln -s python3 python3_`cat /var/opt/redislabs/artifacts/VERSION`
 
 ADD redisedge.conf /etc
 CMD ["/etc/redisedge.conf"]
