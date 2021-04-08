@@ -11,7 +11,7 @@ ARG ARCH=x64
 ARG REDISAI_VERSION=1.0.2
 ARG REDISTIMESERIES_VERSION=1.4.6
 ARG REDISGEARS_VERSION=1.0.2
-ARG REDIS_VER=6.0.9
+ARG REDIS_VER=6.2.1
 ARG DEVICE=cpu
 
 ARG DOCKER_ORG=redisfab
@@ -48,18 +48,21 @@ RUN echo "Building redisedge-${OSNICK}:${VERSION}-${DEVICE}-${ARCH} with:" ;\
     echo "  RedisGears=${REDISGEARS_DOCKERDEP}" ;\
     echo "  Redis=${REDIS_DOCKERDEP}"
 
-RUN set -e; if [ ! -z $(command -v apt-get) ]; then apt-get -qq update; apt-get -q install -y libgomp1; fi
-RUN set -e; if [ ! -z $(command -v yum) ]; then yum install -y libgomp; fi
+RUN set -e; if [ ! -z $(command -v apt-get) ]; then apt-get -qq update; apt-get -q install -y libgomp1 git; fi
+RUN set -e; if [ ! -z $(command -v yum) ]; then yum install -y libgomp git; fi
 
 ENV LIBDIR /usr/lib/redis/modules
 ENV LD_LIBRARY_PATH $LIBDIR
 WORKDIR /data
 RUN mkdir -p ${LIBDIR}
 
-COPY --from=timeseries ${LIBDIR}/*.so ${LIBDIR}/
-COPY --from=ai         ${LIBDIR}/ ${LIBDIR}/
-COPY --from=gears      /var/opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
-COPY --from=gears      /var/opt/redislabs/modules/ /var/opt/redislabs/modules/
+COPY --from=timeseries --chown=redis:redis ${LIBDIR}/*.so ${LIBDIR}/
+COPY --from=ai --chown=redis:redis ${LIBDIR}/ ${LIBDIR}/
+COPY --from=gears --chown=redis:redis /var/opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
+COPY --from=gears --chown=redis:redis /var/opt/redislabs/modules/ /var/opt/redislabs/modules/
+
+WORKDIR /var/opt/redislabs/modules/rg
+RUN ln -s python3 python3_`cat /var/opt/redislabs/artifacts/VERSION`
 
 ADD redisedge.conf /etc
 CMD ["/etc/redisedge.conf"]

@@ -4,7 +4,7 @@ MK.pyver:=3
 include $(ROOT)/deps/readies/mk/main
 
 # OSNICK=buster|stretch|bionic
-OSNICK ?= bionic
+OSNICK ?= bionic # buster
 
 REPO=redisedge
 

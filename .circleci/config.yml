@@ -36,6 +36,9 @@ commands:
           no_output_timeout: 40m
 
   edge-build-steps:
+    parameters:
+      platform:
+        type: string
     steps:
       - setup-executor
       - checkout
@@ -49,7 +52,7 @@ commands:
           command: |
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
             for i in cpu gpu; do
-              make -C edge build publish PUSH_EDGE=1 DOCKER_ORG=redislabs REDISGEARS_DOCKERDEP=edge REDISTIMESERIES_DOCKERDEP=edge REDISAI_DOCKERDEP=edge-$i VERSION=edge VARIANT=x64-$i
+              make -C edge build publish OSNICK=<<parameters.platform>> PUSH_EDGE=1 DOCKER_ORG=redislabs REDISGEARS_DOCKERDEP=edge REDISTIMESERIES_DOCKERDEP=edge REDISAI_DOCKERDEP=edge-$i VERSION=edge VARIANT=x64-$i
             done
           no_output_timeout: 40m
 
