@@ -7,7 +7,8 @@ commands:
       - checkout
       - run:
           name: Checkout submodules
-          command: git submodule update --init --recursive
+          command: |
+            git submodule update --init --recursive
 
   setup-build-system:
     steps:
@@ -36,7 +37,7 @@ jobs:
         type: string
         default: ""
     docker:
-      - image: debian:buster
+      - image: cimg/base:2020.01
     steps:
       - setup_remote_docker
       - checkout-all
