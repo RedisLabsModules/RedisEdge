@@ -1,85 +1,42 @@
 version: 2.1
 
 commands:
-  setup-executor:
-    steps:
-      - run:
-          name: Setup executor
-          command: |
-            apt-get -qq update
-            apt-get -q install -y git openssh-client curl ca-certificates make tar gzip
-            bash <(curl -fsSL https://get.docker.com)
-      - setup_remote_docker:
-          docker_layer_caching: true
 
-  platform-build-steps:
-    parameters:
-      platform:
-        type: string
-      publish:
-        type: boolean
-        default: false
+  checkout-all:
     steps:
-      - setup-executor
       - checkout
       - run:
-          name: Setup
+          name: Checkout submodules
           command: |
             git submodule update --init --recursive
-            ./deps/readies/bin/getpy3
-      - run:
-          name: Build for platform
-          command: |
-            docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            make build OSNICK=<<parameters.platform>>
-            <<# parameters.publish >> make publish OSNICK=<<parameters.platform>> <</ parameters.publish >>
-          no_output_timeout: 40m
 
-  edge-build-steps:
-    parameters:
-      platform:
-        type: string
+  setup-build-system:
     steps:
-      - setup-executor
-      - checkout
       - run:
-          name: Setup
-          command: |
-            git submodule update --init --recursive
-            ./deps/readies/bin/getpy3
-      - run:
-          name: Build for platform
-          command: |
-            docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            for i in cpu gpu; do
-              make -C edge build publish OSNICK=<<parameters.platform>> PUSH_EDGE=1 DOCKER_ORG=redislabs REDISGEARS_DOCKERDEP=edge REDISTIMESERIES_DOCKERDEP=edge REDISAI_DOCKERDEP=edge-$i VERSION=edge VARIANT=x64-$i
-            done
-          no_output_timeout: 40m
+          name: system setup
+          command: ./deps/readies/bin/getpy3
 
 jobs:
-  platform-build:
-    parameters:
-      platform:
-        type: string
-      publish:
-        type: boolean
-        default: false
-    docker:
-      - image: debian:buster
-    steps:
-      - platform-build-steps:
-          platform: <<parameters.platform>>
-          publish: <<parameters.publish>>
 
   edge-build:
     parameters:
-      platform:
+      variant:
         type: string
+      publish:
+        type: string
+        default: ""
     docker:
-      - image: debian:buster
+      - image: cimg/python:3.9
     steps:
-      - edge-build-steps:
-          platform: <<parameters.platform>>
+      - setup_remote_docker
+      - checkout-all
+      - setup-build-system
+      - run:
+          name: Build edge for variant
+          command: |
+            docker login -u redisfab -p $DOCKER_REDISFAB_PWD
+            make -C edge build DOCKER_SUFFIX="<<parameters.variant>>" VERBOSE=1 <<parameters.variant>> <<parameters.publish>>
+          no_output_timeout: 40m
 
 on-any-branch: &on-any-branch
   filters:
@@ -120,20 +77,29 @@ workflows:
   version: 2
   default_flow:
     jobs:
-      - platform-build:
-          name: build-bionic
-          platform: bionic
-          publish: true
+      - edge-build:
+          context: common
+          matrix:
+              parameters:
+                variant:
+                  - "GPU=1"
+                  - "CPU=1"
           <<: *on-any-branch
 
-  edge_dailies:
+  edge_nightly:
     triggers:
       - schedule:
-          cron: "2 9,18 * * *"
+          cron: "2 3 * * *"
           filters:
             branches:
               only: master
     jobs:
-      - platform-build:
-          name: build-edge
-          platform: bionic
+      - edge-build:
+          context: common
+          matrix:
+            parameters:
+              variant:
+                - "GPU=1"
+                - "CPU=1"
+              publish:
+                - "PUBLISH=1"

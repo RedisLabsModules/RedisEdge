@@ -1,0 +1,39 @@
+# BUILD {{REDIS_DOCKER_ORG}}/redisedge:{{VERSION}}-cpu-{{REDIS_ARCH}}-{{REDIS_OSNICK}}
+
+#----------------------------------------------------------------------------------------------
+FROM {{REDIS_DOCKER_ORG}}/redisai:{{REDISAI_DOCKERTAG}} as ai
+FROM {{REDIS_DOCKER_ORG}}/redistimeseries:{{REDISTIMESERIES_DOCKERTAG}} as timeseries
+FROM {{REDIS_DOCKER_ORG}}/redisgears:{{REDISGEARS_DOCKERTAG}} as gears
+
+#----------------------------------------------------------------------------------------------
+FROM {{REDIS_DOCKER_ORG}}/redis:{{REDIS_DOCKERTAG}}
+
+COPY --chown=root:root ./edge/sudofile /etc/sudoers.d/99-redislabs
+
+RUN echo "Building redisedge-{{REDIS_OSNICK}}:{{VERSION}}-{{DEVICE}}-{{REDIS_ARCH}} with:" ;\
+    echo "  RedisAI={{REDISAI_DOCKERTAG}}";\
+    echo "  RedisTimeSeries={{REDISTIMESERIES_DOCKERTAG}}" ;\
+    echo "  RedisGears={{REDISGEARS_DOCKERTAG}}" ;\
+    echo "  Redis={{REDIS_DOCKERTAG}}"
+
+ENV LIBDIR /usr/lib/redis/modules
+ENV LD_LIBRARY_PATH $LIBDIR
+
+RUN set -e; if [ ! -z $(command -v apt-get) ]; then sudo apt-get -qq update; sudo apt-get -q install -y libgomp1 git; fi
+RUN set -e; if [ ! -z $(command -v yum) ]; then sudo yum install -y libgomp git; fi
+
+RUN sudo mkdir -p ${LIBDIR}
+RUN sudo chown -R redislabs:redislabs ${LIBDIR}
+
+COPY --from=timeseries --chown=redislabs:redislabs ${LIBDIR}/*.so ${LIBDIR}/
+COPY --from=ai --chown=redislabs:redislabs ${LIBDIR}/ ${LIBDIR}/
+COPY --from=gears --chown=redislabs:redislabs /var/opt/redislabs/lib/modules/redisgears.so ${LIBDIR}/
+COPY --from=gears --chown=redislabs:redislabs /var/opt/redislabs/modules/ /var/opt/redislabs/modules/
+
+WORKDIR /var/opt/redislabs/modules/rg
+RUN ln -s python3 python3_`cat /var/opt/redislabs/artifacts/VERSION`
+
+RUN sudo rm /etc/sudoers.d/99-redislabs
+
+ADD redisedge.conf /etc
+CMD ["/etc/redisedge.conf"]
