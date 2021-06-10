@@ -10,23 +10,6 @@ commands:
           command: |
             git submodule update --init --recursive
 
-  setup-build-system:
-    steps:
-      - run:
-          name: system setup
-          command: ./deps/readies/bin/getpy3
-
-  setup-executor:
-    steps:
-      - run:
-          name: Setup executor
-          command: |
-            apt-get -qq update
-            apt-get -q install -y git openssh-client curl ca-certificates make tar gzip
-            bash <(curl -fsSL https://get.docker.com)
-      - setup_remote_docker:
-          docker_layer_caching: true
-
 jobs:
 
   edge-build:
@@ -41,12 +24,11 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout-all
-      - setup-build-system
       - run:
           name: Build edge for variant
           command: |
             docker login -u redisfab -p $DOCKER_REDISFAB_PWD
-            make -C edge build DOCKER_SUFFIX="<parameters.variant>>" VERBOSE=1 <<parameters.variant>> <<parameters.publish>>
+            make -C edge build DOCKER_SUFFIX="<<parameters.variant>>" VERBOSE=1 <<parameters.variant>> <<parameters.publish>>
           no_output_timeout: 40m
 
 on-any-branch: &on-any-branch
