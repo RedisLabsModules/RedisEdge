@@ -29,8 +29,8 @@ jobs:
       - image: cimg/python:3.9
     steps:
       - setup_remote_docker
-      - setup-build-system
       - checkout-all
+      - setup-build-system
       - run:
           name: Build edge for variant
           command: |
